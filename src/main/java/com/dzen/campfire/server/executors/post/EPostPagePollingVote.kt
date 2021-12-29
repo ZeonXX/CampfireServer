@@ -1,0 +1,53 @@
+package com.dzen.campfire.server.executors.post
+
+import com.dzen.campfire.api.API
+import com.dzen.campfire.api.models.publications.post.Page
+import com.dzen.campfire.api.models.publications.post.PagePolling
+import com.dzen.campfire.api.models.publications.post.PublicationPost
+import com.dzen.campfire.api.requests.post.RPostPagePollingVote
+import com.dzen.campfire.server.controllers.ControllerCollisions
+import com.dzen.campfire.server.controllers.ControllerPublications
+import com.dzen.campfire.server.controllers.ControllerWiki
+import com.dzen.campfire.api.tools.ApiException
+
+class EPostPagePollingVote : RPostPagePollingVote(0, 0, 0, 0, 0) {
+
+    @Throws(ApiException::class)
+    override fun check() {
+
+        var pages: Array<Page> = emptyArray()
+
+        if (sourceType == API.PAGES_SOURCE_TYPE_POST || sourceType == 0L /*Обратная совместимость*/) {
+            val publication = ControllerPublications.getPublication(sourceId, apiAccount.id)
+            if (publication == null || publication !is PublicationPost) throw ApiException(API.ERROR_GONE)
+            pages = publication.pages
+        }
+        if (sourceType == API.PAGES_SOURCE_TYPE_WIKI) {
+            val wikiPages = ControllerWiki.getPagesByItemId(sourceId, sourceIdSub) ?: throw ApiException(API.ERROR_GONE)
+            pages = wikiPages.pages
+        }
+
+        var polling: PagePolling? = null
+        for (p in pages) {
+            if (p is PagePolling && p.pollingId == pollingId) {
+                polling = p
+                break
+            }
+        }
+
+        if (polling == null) throw ApiException(API.ERROR_GONE)
+        if (polling.minLevel > apiAccount.accessTag) throw ApiException(E_LOW_LEVEL)
+        if (polling.minKarma > apiAccount.accessTagSub) throw ApiException(E_LOW_KARMA)
+
+    }
+
+    @Throws(ApiException::class)
+    override fun execute(): Response {
+
+        if (ControllerCollisions.checkCollisionExist(apiAccount.id, pollingId, API.COLLISION_PAGE_POLLING_VOTE))
+            throw ApiException(E_ALREADY)
+        ControllerCollisions.putCollisionValue1(apiAccount.id, pollingId, itemId, API.COLLISION_PAGE_POLLING_VOTE, System.currentTimeMillis())
+
+        return Response()
+    }
+}
