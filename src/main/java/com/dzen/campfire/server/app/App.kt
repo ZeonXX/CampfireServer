@@ -41,6 +41,11 @@ object App {
 
         val keyFileJKS = File("secrets/Certificate.jks")
         val keyFileBKS = File("secrets/Certificate.bks")
+        System.setProperty("javax.net.ssl.keyStore","secrets/Certificate.jks")
+        System.setProperty("javax.net.ssl.keyStorePassword", jksPassword)
+        System.setProperty("javax.net.ssl.trustStore","secrets/Certificate.jks")
+        System.setProperty("javax.net.ssl.trustStorePassword", jksPassword)
+
         val jarFile = "${patchPrefix}CampfireServer.jar"
 
         val botTokensList = ToolsFiles.readListOrNull("secrets/BotsTokens.txt")?:ArrayList()
