@@ -18,6 +18,9 @@ class EPublicationsKarmaAdd : RPublicationsKarmaAdd(0, false, 0, false) {
 
     @Throws(ApiException::class)
     override fun check() {
+
+        if(botToken != null) throw ApiException(API.ERROR_ACCESS)
+
         publication = ControllerPublications.getPublication(publicationId, apiAccount.id)
 
         if (publication == null) throw ApiException(API.ERROR_GONE)

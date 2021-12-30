@@ -43,6 +43,8 @@ object App {
         val keyFileBKS = File("secrets/Certificate.bks")
         val jarFile = "${patchPrefix}CampfireServer.jar"
 
+        val botTokensList = ToolsFiles.readListOrNull("secrets/BotsTokens.txt")?:ArrayList()
+
         try {
             System.err.println("Sayzen Studio")
             System.err.println(ToolsDate.getTimeZoneName() + " ( " + ToolsDate.getTimeZoneHours() + " )")
@@ -61,7 +63,8 @@ object App {
                     jksPassword,
                     API.PORT_HTTPS,
                     API.PORT_HTTP,
-                    API.PORT_CERTIFICATE
+                    API.PORT_CERTIFICATE,
+                    botTokensList,
             )
 
             while (true) {
