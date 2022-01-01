@@ -41,6 +41,15 @@ class EChatChange : RChatChange(0, "", null, emptyArray(), emptyArray(), emptyAr
         }
 
         oldParams = ControllerChats.getChatParams(chatId)
+
+        val conferenceBlocks = arrayListOf<Long>()
+        for (newAccount in newAccounts) {
+            if (! ControllerAccounts.getSettings(newAccount).allowAddingToConferences)
+                conferenceBlocks.add(newAccount)
+        }
+        if (conferenceBlocks.isNotEmpty()) {
+            throw ApiException(E_CONFERENCE_BLOCK, "", conferenceBlocks.map { it.toString() }.toTypedArray())
+        }
     }
 
     override fun execute(): Response {
