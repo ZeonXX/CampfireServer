@@ -16,17 +16,6 @@ object ControllerResources {
     val databaseAddress = ToolsFiles.readLineOrNull(File("secrets/Config.txt"), 9)?:""
     val database = DatabasePool(databaseLogin, databasePassword, databaseName, databaseAddress, 8)
 
-
-    /*
-
-
-    CREATE USER 'sayzencfdbserver'@'%' IDENTIFIED BY '17m714LpXL';
-
-    GRANT ALL PRIVILEGES ON *.* TO 'sayzencfdbserver'@'%';
-
-     */
-
-
     //
     //  Methods
     //
