@@ -162,7 +162,12 @@ object ControllerMigrator {
 
 
     fun indexImages() {
-        val db = DatabaseInstance("sayzen_campfire", "SayzenSTK2012", "campfire_db_media", "46.254.16.245")
+
+        val databaseLogin = ToolsFiles.readLineOrNull(File("secrets/Config.txt"), 6)?:""
+        val databasePassword = ToolsFiles.readLineOrNull(File("secrets/Config.txt"), 7)?:""
+        val databaseName = ToolsFiles.readLineOrNull(File("secrets/Config.txt"), 8)?:""
+        val databaseAddress = ToolsFiles.readLineOrNull(File("secrets/Config.txt"), 9)?:""
+        val db = DatabaseInstance(databaseLogin, databasePassword, databaseName, databaseAddress)
 
         info("indexing posts...")
         indexingPosts(db)

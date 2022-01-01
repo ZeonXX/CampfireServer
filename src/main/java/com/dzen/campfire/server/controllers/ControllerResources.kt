@@ -4,11 +4,28 @@ import com.dzen.campfire.api_media.requests.*
 import com.dzen.campfire.server.app.App
 import com.dzen.campfire.server.tables.TPublications
 import com.dzen.campfire.server.tables.TResources
+import com.sup.dev.java.tools.ToolsFiles
 import com.sup.dev.java_pc.sql.*
+import java.io.File
 
 object ControllerResources {
 
-    val database = DatabasePool("sayzen_campfire", "SayzenSTK2012", "campfire_db_media", if(App.test) "46.254.16.245"  else "127.0.0.1", 8)
+    val databaseLogin = ToolsFiles.readLineOrNull(File("secrets/Config.txt"), 6)?:""
+    val databasePassword = ToolsFiles.readLineOrNull(File("secrets/Config.txt"), 7)?:""
+    val databaseName = ToolsFiles.readLineOrNull(File("secrets/Config.txt"), 8)?:""
+    val databaseAddress = ToolsFiles.readLineOrNull(File("secrets/Config.txt"), 9)?:""
+    val database = DatabasePool(databaseLogin, databasePassword, databaseName, databaseAddress, 8)
+
+
+    /*
+
+
+    CREATE USER 'sayzencfdbserver'@'%' IDENTIFIED BY '17m714LpXL';
+
+    GRANT ALL PRIVILEGES ON *.* TO 'sayzencfdbserver'@'%';
+
+     */
+
 
     //
     //  Methods
