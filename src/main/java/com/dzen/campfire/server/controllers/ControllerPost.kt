@@ -197,6 +197,11 @@ object ControllerPost {
             is PageCampfireObject -> {
                 if (page.link.length > API.PAGE_CAMPFIRE_OBJECT_LINK_MAX) throw ApiException(eBadPage, "PageCampfireObject. Bad link size")
             }
+            is PageCode -> {
+                page.code = ControllerCensor.cens(page.code, "%s", "*")
+                if (page.code.length > API.PAGE_TEXT_MAX_L)
+                    throw ApiException(eBadPage, "PageCode. Bad code length [${page.code.length} > ${API.PAGE_TEXT_MAX_L}]")
+            }
             else -> {
                 throw ApiException(eBadPage, "Unknown page type [${page.getType()}]")
             }
