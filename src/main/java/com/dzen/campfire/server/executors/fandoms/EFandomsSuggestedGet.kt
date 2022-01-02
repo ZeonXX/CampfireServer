@@ -8,6 +8,7 @@ import com.dzen.campfire.server.controllers.ControllerAccounts
 import com.dzen.campfire.server.controllers.ControllerFandom
 import com.dzen.campfire.server.tables.TAccounts
 import com.dzen.campfire.api.tools.ApiException
+import com.dzen.campfire.server.controllers.ControllerCollisions
 
 class EFandomsSuggestedGet : RFandomsSuggestedGet(0) {
 
@@ -32,7 +33,8 @@ class EFandomsSuggestedGet : RFandomsSuggestedGet(0) {
                 ControllerFandom.getParams(fandomId, 1),
                 ControllerFandom.getParams(fandomId, 2),
                 ControllerFandom.getParams(fandomId, 3),
-                ControllerFandom.getParams(fandomId, 4)
+                ControllerFandom.getParams(fandomId, 4),
+                ControllerCollisions.getCollisionValue2(fandomId, API.COLLISION_FANDOM_SUGGESTION_NOTES)
         )
     }
 

@@ -10,7 +10,7 @@ import com.sup.dev.java.tools.ToolsText
 import com.sup.dev.java_pc.sql.Database
 import com.sup.dev.java_pc.tools.ToolsImage
 
-class EFandomsSuggest : RFandomsSuggest("", 0, false, null, null, emptyArray(), emptyArray(), emptyArray(), emptyArray()) {
+class EFandomsSuggest : RFandomsSuggest("", 0, false, null, null, emptyArray(), emptyArray(), emptyArray(), emptyArray(), "") {
 
     @Throws(ApiException::class)
     override fun check() {
@@ -39,6 +39,7 @@ class EFandomsSuggest : RFandomsSuggest("", 0, false, null, null, emptyArray(), 
         if (!ToolsImage.checkImageScaleUnknownType(image!!, API.FANDOM_TITLE_IMG_W, API.FANDOM_TITLE_IMG_H, true, false, true)) throw ApiException(E_BAD_IMG_SIZE)
         if (!ToolsImage.checkImageScaleUnknownType(imageMini!!, API.FANDOM_IMG_SIDE, API.FANDOM_IMG_SIDE, true, false, true)) throw ApiException(E_BAD_IMG_MINI_SIZE)
         if (name.isEmpty() || name.length > API.FANDOM_NAME_MAX || !ToolsText.isOnly(name, API.ENGLISH)) throw ApiException(E_BAD_NAME_L)
+        if (notes.length > API.FANDOM_DESCRIPTION_MAX_L) throw ApiException(E_BAD_NOTES_L)
     }
 
     override fun execute(): Response {
@@ -59,6 +60,7 @@ class EFandomsSuggest : RFandomsSuggest("", 0, false, null, null, emptyArray(), 
         ControllerCollisions.putCollisions(fandomId, params2, API.COLLISION_FANDOM_PARAMS_2)
         ControllerCollisions.putCollisions(fandomId, params3, API.COLLISION_FANDOM_PARAMS_3)
         ControllerCollisions.putCollisions(fandomId, params4, API.COLLISION_FANDOM_PARAMS_4)
+        ControllerCollisions.putCollisionValue2(fandomId, API.COLLISION_FANDOM_SUGGESTION_NOTES, notes)
 
         return Response()
     }
