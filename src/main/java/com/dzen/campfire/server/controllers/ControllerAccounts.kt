@@ -28,9 +28,8 @@ object ControllerAccounts {
     fun instance(v: ResultRows) = instance(v.nextLongOrZero(), v.nextLongOrZero(), v.nextLongOrZero(), v.nextMayNull()
             ?: "", v.nextLongOrZero(), v.nextLongOrZero(), v.nextLongOrZero())
 
-    fun instance(accountId: Long, lvl: Long, lastOnlineDate: Long, name: String, imageId: Long, sex: Long, karma30: Long): Account {
-        val account = Account(accountId, lvl, lastOnlineDate, name, imageId, sex, karma30, OptimizerSponsor.getSponsor(accountId), OptimizerSponsor.getSponsorTimes(accountId), OptimizerEffects.get(accountId))
-        return account
+    fun instance(accountId: Long, lvl: Long, lastOnlineDate: Long, name: String, imageId: Long, sex: Long, karma30: Long, dateCreate: Long = 0): Account {
+        return Account(accountId, lvl, lastOnlineDate, name, imageId, sex, karma30, OptimizerSponsor.getSponsor(accountId), OptimizerSponsor.getSponsorTimes(accountId), OptimizerEffects.get(accountId), dateCreate)
     }
 
     fun addNotificationToken(accountId: Long, token: String) {

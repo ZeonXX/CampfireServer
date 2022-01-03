@@ -5,10 +5,9 @@ import com.dzen.campfire.api.models.publications.post.Page
 import com.dzen.campfire.api.models.publications.post.PagePolling
 import com.dzen.campfire.api.models.publications.post.PublicationPost
 import com.dzen.campfire.api.requests.post.RPostPagePollingVote
-import com.dzen.campfire.server.controllers.ControllerCollisions
-import com.dzen.campfire.server.controllers.ControllerPublications
-import com.dzen.campfire.server.controllers.ControllerWiki
 import com.dzen.campfire.api.tools.ApiException
+import com.dzen.campfire.server.controllers.*
+import com.dzen.campfire.server.tables.TAccounts
 
 class EPostPagePollingVote : RPostPagePollingVote(0, 0, 0, 0, 0) {
 
@@ -38,7 +37,11 @@ class EPostPagePollingVote : RPostPagePollingVote(0, 0, 0, 0, 0) {
         if (polling == null) throw ApiException(API.ERROR_GONE)
         if (polling.minLevel > apiAccount.accessTag) throw ApiException(E_LOW_LEVEL)
         if (polling.minKarma > apiAccount.accessTagSub) throw ApiException(E_LOW_KARMA)
+        val days = (System.currentTimeMillis() - apiAccount.dateCreate) / (3600000L * 24) + 1
+        if (polling.minDays > days) throw ApiException(E_LOW_DAYS)
 
+        if (polling.blacklist.find { it.id == apiAccount.id } != null)
+            throw ApiException(E_BLACKLISTED)
     }
 
     @Throws(ApiException::class)

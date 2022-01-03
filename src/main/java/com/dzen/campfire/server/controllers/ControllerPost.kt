@@ -128,6 +128,7 @@ object ControllerPost {
                     page.options[i] = ControllerCensor.cens(page.options[i])
                     if (page.options[i].length > API.PAGE_POLLING_OPTION_MAX_TEXT) throw ApiException(eBadPage, "PagePolling. Bad option size")
                 }
+                if (page.blacklist.size > API.PAGE_POLLING_BLACKLIST_MAX) throw ApiException(eBadPage, "PagePolling. Too many blacklisted users")
             }
             is PageImages -> {
                 page.title = ControllerCensor.cens(page.title)

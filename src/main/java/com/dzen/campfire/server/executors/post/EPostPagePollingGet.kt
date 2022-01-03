@@ -31,7 +31,7 @@ class EPostPagePollingGet : RPostPagePollingGet(0) {
                 .where(TCollisions.collision_type, "=", API.COLLISION_PAGE_POLLING_VOTE))
 
         val results = Array(v.rowsCount) { PagePolling.Result() }
-        for (i in 0 until results.size) {
+        for (i in results.indices) {
             val id: Long? = v.next()
             results[i].itemId = id ?: -1L
             results[i].count = v.next()
@@ -46,7 +46,7 @@ class EPostPagePollingGet : RPostPagePollingGet(0) {
 
         if (!v.isEmpty) {
             val myVoteItemId: Long = v.next()
-            for (i in 0 until results.size)
+            for (i in results.indices)
                 if (results[i].itemId == myVoteItemId) results[i].myVote = true
         }
 
