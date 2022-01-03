@@ -37,8 +37,7 @@ class EPostPagePollingVote : RPostPagePollingVote(0, 0, 0, 0, 0) {
         if (polling == null) throw ApiException(API.ERROR_GONE)
         if (polling.minLevel > apiAccount.accessTag) throw ApiException(E_LOW_LEVEL)
         if (polling.minKarma > apiAccount.accessTagSub) throw ApiException(E_LOW_KARMA)
-        val dateCreate = ControllerAccounts.get(apiAccount.id, TAccounts.date_create).next<Long>()
-        val days = (System.currentTimeMillis() - dateCreate) / (3600000L * 24) + 1
+        val days = (System.currentTimeMillis() - apiAccount.dateCreate) / (3600000L * 24) + 1
         if (polling.minDays > days) throw ApiException(E_LOW_DAYS)
 
         if (polling.blacklist.find { it.id == apiAccount.id } != null)
