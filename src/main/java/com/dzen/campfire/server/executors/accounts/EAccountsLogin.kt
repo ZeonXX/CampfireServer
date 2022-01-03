@@ -5,6 +5,7 @@ import com.dzen.campfire.api.models.account.Account
 import com.dzen.campfire.api.models.account.AccountSettings
 import com.dzen.campfire.api.requests.accounts.RAccountsLogin
 import com.dzen.campfire.server.controllers.*
+import com.dzen.campfire.server.tables.TAccounts
 import com.sup.dev.java.libs.json.Json
 import java.lang.Exception
 
@@ -42,7 +43,11 @@ class EAccountsLogin : RAccountsLogin("", 0) {
 
     private fun loadAccount() {
         if (apiAccount.id < 1) return
-        account = ControllerAccounts.instance(apiAccount.id, apiAccount.accessTag, System.currentTimeMillis(), apiAccount.name, apiAccount.imageId, apiAccount.sex, apiAccount.accessTagSub)
+        account = ControllerAccounts.instance(
+                apiAccount.id, apiAccount.accessTag, System.currentTimeMillis(),
+                apiAccount.name, apiAccount.imageId, apiAccount.sex, apiAccount.accessTagSub,
+                ControllerAccounts.get(apiAccount.id, TAccounts.date_create).next()
+        )
     }
 
     private fun updateEnter() {
