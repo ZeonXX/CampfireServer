@@ -46,7 +46,7 @@ class EAccountsLogin : RAccountsLogin("", 0) {
         account = ControllerAccounts.instance(
                 apiAccount.id, apiAccount.accessTag, System.currentTimeMillis(),
                 apiAccount.name, apiAccount.imageId, apiAccount.sex, apiAccount.accessTagSub,
-                ControllerAccounts.get(apiAccount.id, TAccounts.date_create).next()
+                apiAccount.dateCreate,
         )
     }
 
