@@ -36,7 +36,6 @@ class EAccountsLogin : RAccountsLogin("", 0, 0, 0) {
 
         val serverTranslateHash = ControllerServerTranslates.getHash(languageId)
         val translateMap = if (serverTranslateHash == translateMapHash && translateMapHash != 0) {
-            println("not sending rus")
             hashMapOf()
         } else {
             ControllerServerTranslates.getMap(languageId)
@@ -44,7 +43,6 @@ class EAccountsLogin : RAccountsLogin("", 0, 0, 0) {
 
         val serverTranslateHashEng = ControllerServerTranslates.getHash(API.LANGUAGE_EN)
         val translateMapEng = if (serverTranslateHashEng == translateMapHashEng && translateMapHashEng != 0) {
-            println("not sending eng")
             hashMapOf()
         } else {
             ControllerServerTranslates.getMap(API.LANGUAGE_EN)
