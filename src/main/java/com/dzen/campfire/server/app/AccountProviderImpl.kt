@@ -42,12 +42,12 @@ class AccountProviderImpl : AccountProvider() {
 
         if (token == null) return null
 
-        if(token.startsWith(API.LOGIN_EMAIL_PREFIX)){
+        if(token.startsWith(API.LOGIN_EMAIL_SHA_PREFIX)){
             val split = token.split(API.LOGIN_SPLITTER)
             val email = split[1]
-            val password = token.substring(API.LOGIN_EMAIL_PREFIX.length + API.LOGIN_SPLITTER.length + email.length + API.LOGIN_SPLITTER.length)
+            val passwordSha512 = token.substring(API.LOGIN_EMAIL_SHA_PREFIX.length + API.LOGIN_SPLITTER.length + email.length + API.LOGIN_SPLITTER.length)
 
-            val accountId = ControllerEmail.getAccountId(email, password)
+            val accountId = ControllerEmail.getAccountId(email, passwordSha512)
 
             return select(instanceSelect().where(TAccounts.id, "=", accountId))
         }else{

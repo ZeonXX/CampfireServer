@@ -19,10 +19,9 @@ import com.sup.dev.java_pc.sql.SqlQueryUpdate
 import com.sup.dev.java_pc.tools.ToolsImage
 
 class EAccountsRegistrationEmail : RAccountsRegistrationEmail("", "", 0) {
-
     @Throws(ApiException::class)
     override fun check() {
-        throw ApiException(E_EMAIL_EXIST)
+        throw ApiException(E_EMAIL_EXIST)   //  Отключена регистрация по Email из-за простоты создания ботов
         if (!ToolsText.isValidEmailAddress(email)) throw RuntimeException("Invalid email [$email]")
         if(ControllerEmail.checkExist(email)) throw ApiException(E_EMAIL_EXIST)
     }
