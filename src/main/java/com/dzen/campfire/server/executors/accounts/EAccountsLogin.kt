@@ -5,11 +5,10 @@ import com.dzen.campfire.api.models.account.Account
 import com.dzen.campfire.api.models.account.AccountSettings
 import com.dzen.campfire.api.requests.accounts.RAccountsLogin
 import com.dzen.campfire.server.controllers.*
-import com.dzen.campfire.server.tables.TAccounts
 import com.sup.dev.java.libs.json.Json
 import java.lang.Exception
 
-class EAccountsLogin : RAccountsLogin("", 0) {
+class EAccountsLogin : RAccountsLogin("", 0, 0, 0) {
 
     private var account: Account? = null
 
@@ -35,9 +34,28 @@ class EAccountsLogin : RAccountsLogin("", 0) {
         } catch (e: Exception) {
         }
 
-        return Response(API.VERSION, API.SUPPORTED_VERSION, arrayOf("0.82b", "0.83b", "0.84b", "0.841b", "0.850b", "0.851b", "0.860b", "0.861b"), API.PROTOADMINS, account, accountSettings, apiAccount.tag_s_1.isNotEmpty(),
-                languageId, ControllerServerTranslates.getMap(languageId),
-                ControllerServerTranslates.getMap(API.LANGUAGE_EN)
+        val serverTranslateHash = ControllerServerTranslates.getHash(languageId)
+        val translateMap = if (serverTranslateHash == translateMapHash && translateMapHash != 0) {
+            println("not sending rus")
+            hashMapOf()
+        } else {
+            ControllerServerTranslates.getMap(languageId)
+        }
+
+        val serverTranslateHashEng = ControllerServerTranslates.getHash(API.LANGUAGE_EN)
+        val translateMapEng = if (serverTranslateHashEng == translateMapHashEng && translateMapHashEng != 0) {
+            println("not sending eng")
+            hashMapOf()
+        } else {
+            ControllerServerTranslates.getMap(API.LANGUAGE_EN)
+        }
+
+        return Response(
+                API.VERSION, API.SUPPORTED_VERSION,
+                arrayOf("0.82b", "0.83b", "0.84b", "0.841b", "0.850b", "0.851b", "0.860b", "0.861b"),
+                API.PROTOADMINS, account, accountSettings, apiAccount.tag_s_1.isNotEmpty(),
+                languageId, translateMap, translateMapEng, serverTranslateHash,
+                serverTranslateHashEng
         )
     }
 
