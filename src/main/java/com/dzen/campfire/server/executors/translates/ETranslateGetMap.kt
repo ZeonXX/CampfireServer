@@ -10,7 +10,10 @@ class ETranslateGetMap : RTranslateGetMap(0) {
     }
 
     override fun execute(): Response {
-        return Response(languageId, ControllerServerTranslates.getMap(languageId))
+        return Response(
+                languageId, ControllerServerTranslates.getMap(languageId),
+                ControllerServerTranslates.getHash(languageId)
+        )
     }
 
 }

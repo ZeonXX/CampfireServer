@@ -12,8 +12,8 @@ import com.sup.dev.java_pc.sql.SqlQuerySelect
 import com.sup.dev.java_pc.sql.SqlQueryUpdate
 
 object ControllerServerTranslates {
-
     val maps = HashMap<Long, HashMap<String, Translate>>()
+    val mapHashes = HashMap<Long, Int>()
 
     fun instanceSelectHistory() = SqlQuerySelect(TTranslatesHistory.NAME,
         TTranslatesHistory.id,
@@ -75,6 +75,10 @@ object ControllerServerTranslates {
         while (v.hasNext()){
             putTranslate(v.next(), v.next(), v.next(), v.next(), v.next())
         }
+
+        for (map in maps.entries) {
+            mapHashes[map.key] = map.value.hashCode()
+        }
     }
 
     fun putHistory(accountId:Long, languageId:Long, languageIdFrom:Long, key:String, text:String, oldText:String, comment:String, projectKey:String, type:Long):TranslateHistory{
@@ -130,9 +134,11 @@ object ControllerServerTranslates {
                     TTranslates.project_key, projectKey
             )
         }
+
+        mapHashes[languageId] = maps[languageId].hashCode()
     }
 
-    fun putTranslate(languageId:Long, key:String, text:String, hint:String, projectKey:String){
+    private fun putTranslate(languageId:Long, key:String, text:String, hint:String, projectKey:String){
         if(maps[languageId] == null) maps[languageId] = HashMap()
         val t = Translate(text)
         t.languageId = languageId
@@ -149,4 +155,7 @@ object ControllerServerTranslates {
         return maps[languageId]?:HashMap()
     }
 
+    fun getHash(languageId: Long): Int {
+        return mapHashes[languageId] ?: 0
+    }
 }
