@@ -5,6 +5,7 @@ import com.dzen.campfire.server.controllers.*
 import com.dzen.campfire.api.tools.server.ApiServer
 import com.dzen.campfire.api.tools.server.RequestFactory
 import com.sup.dev.java.libs.debug.err
+import com.sup.dev.java.libs.json.Json
 import com.sup.dev.java.tools.ToolsDate
 import com.sup.dev.java.tools.ToolsFiles
 import com.sup.dev.java.tools.ToolsThreads
@@ -18,28 +19,29 @@ import java.nio.charset.Charset
 object App {
 
     val accountProvider = AccountProviderImpl()
-    val test = (ToolsFiles.readLineOrNull(File("secrets/Config.txt"), 0)?:"")!="release"
+    val secrets = Json(ToolsFiles.readString("secrets/Secrets.json"))
+    val secretsBotsTokens = secrets.getStrings("bots_tokens")!!.map { it?:"" }.toTypedArray()
+    val secretsConfig = secrets.getJson("config")!!
+    val secretsKeys = secrets.getJson("keys")!!
+    val test = secretsConfig.getString("build_type")!="release"
 
     @JvmStatic
     fun main(args: Array<String>) {
 
-        val patchPrefix = ToolsFiles.readLineOrNull(File("secrets/Config.txt"), 1)?:""
-        val databaseLogin = ToolsFiles.readLineOrNull(File("secrets/Config.txt"), 2)?:""
-        val databasePassword = ToolsFiles.readLineOrNull(File("secrets/Config.txt"), 3)?:""
-        val databaseName = ToolsFiles.readLineOrNull(File("secrets/Config.txt"), 4)?:""
-        val databaseAddress = ToolsFiles.readLineOrNull(File("secrets/Config.txt"), 5)?:""
+        val patchPrefix = secretsConfig.getString("patch_prefix")
+        val databaseLogin = secretsConfig.getString("database_login")
+        val databasePassword = secretsConfig.getString("database_password")
+        val databaseName = secretsConfig.getString("database_name")
+        val databaseAddress = secretsConfig.getString("database_address")
 
-        val keysFile = File("secrets/Keys.txt")
-        val googleNotificationKey = ToolsFiles.readLineOrNull(keysFile, 0)?:""
-        val googleAuthKeyId = ToolsFiles.readLineOrNull(keysFile, 1)?:""
-        val googleAuthKeySecret = ToolsFiles.readLineOrNull(keysFile, 2)?:""
-        val jksPassword = ToolsFiles.readLineOrNull(keysFile, 3)?:""
+        val googleNotificationKey = secretsKeys.getString("google_notification_key")
+        val googleAuthKeyId = secretsKeys.getString("google_auth_key_id")
+        val googleAuthKeySecret = secretsKeys.getString("google_auth_key_secret")
+        val jksPassword = secretsKeys.getString("jks_password")
 
         val keyFileJKS = File("secrets/Certificate.jks")
         val keyFileBKS = File("secrets/Certificate.bks")
         val jarFile = "${patchPrefix}CampfireServer.jar"
-
-        val botTokensList = ToolsFiles.readListOrNull("secrets/BotsTokens.txt")?:ArrayList()
 
         try {
             System.err.println("Sayzen Studio")
@@ -60,7 +62,7 @@ object App {
                     API.PORT_HTTPS,
                     API.PORT_HTTP,
                     API.PORT_CERTIFICATE,
-                    botTokensList,
+                    secretsBotsTokens,
             )
 
             while (true) {

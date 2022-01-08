@@ -48,10 +48,10 @@ object ControllerMigrator {
 
     fun indexImages() {
 
-        val databaseLogin = ToolsFiles.readLineOrNull(File("secrets/Config.txt"), 6)?:""
-        val databasePassword = ToolsFiles.readLineOrNull(File("secrets/Config.txt"), 7)?:""
-        val databaseName = ToolsFiles.readLineOrNull(File("secrets/Config.txt"), 8)?:""
-        val databaseAddress = ToolsFiles.readLineOrNull(File("secrets/Config.txt"), 9)?:""
+        val databaseLogin = App.secretsConfig.getString("database_media_login")
+        val databasePassword = App.secretsConfig.getString("database_media_password")
+        val databaseName = App.secretsConfig.getString("database_media_name")
+        val databaseAddress = App.secretsConfig.getString("database_media_address")
         val db = DatabaseInstance(databaseLogin, databasePassword, databaseName, databaseAddress)
 
         info("indexing posts...")

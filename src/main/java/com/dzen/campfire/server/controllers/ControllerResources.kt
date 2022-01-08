@@ -2,18 +2,15 @@ package com.dzen.campfire.server.controllers
 
 import com.dzen.campfire.api_media.requests.*
 import com.dzen.campfire.server.app.App
-import com.dzen.campfire.server.tables.TPublications
 import com.dzen.campfire.server.tables.TResources
-import com.sup.dev.java.tools.ToolsFiles
 import com.sup.dev.java_pc.sql.*
-import java.io.File
 
 object ControllerResources {
 
-    val databaseLogin = ToolsFiles.readLineOrNull(File("secrets/Config.txt"), 6)?:""
-    val databasePassword = ToolsFiles.readLineOrNull(File("secrets/Config.txt"), 7)?:""
-    val databaseName = ToolsFiles.readLineOrNull(File("secrets/Config.txt"), 8)?:""
-    val databaseAddress = ToolsFiles.readLineOrNull(File("secrets/Config.txt"), 9)?:""
+    val databaseLogin = App.secretsConfig.getString("database_media_login")
+    val databasePassword = App.secretsConfig.getString("database_media_password")
+    val databaseName = App.secretsConfig.getString("database_media_name")
+    val databaseAddress = App.secretsConfig.getString("database_media_address")
     val database = DatabasePool(databaseLogin, databasePassword, databaseName, databaseAddress, 8)
 
     //
