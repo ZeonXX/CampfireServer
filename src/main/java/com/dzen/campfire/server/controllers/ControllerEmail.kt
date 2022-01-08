@@ -17,13 +17,21 @@ object ControllerEmail {
     fun getAccountId(email:String, passwordSha512:String):Long{
 
         val rows = Database.select("ControllerEmail.getAccountId 1",
-                SqlQuerySelect(TAccountsEmails.NAME, TAccountsEmails.id, TAccountsEmails.account_password)
+                SqlQuerySelect(TAccountsEmails.NAME, TAccountsEmails.account_id, TAccountsEmails.account_password)
                 .whereValue(TAccountsEmails.account_email, "=", email)
         )
 
         while (rows.hasNext()){
             val accountId = rows.nextLongOrZero()
             val realPasswordBCrypt = rows.next<String>()
+
+            if(realPasswordBCrypt.length == 32){
+                //  Обратная совместимость
+                if(realPasswordBCrypt == passwordSha512) {
+                    return accountId
+                }
+                return 0
+            }
 
             if(ToolsCryptography.bcryptCheck(passwordSha512, realPasswordBCrypt)){
                 return accountId

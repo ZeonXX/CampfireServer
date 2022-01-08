@@ -2,9 +2,11 @@ package com.dzen.campfire.server.controllers
 
 import com.dzen.campfire.api.API
 import com.dzen.campfire.api.models.notifications.project.NotificationDonate
+import com.dzen.campfire.server.app.App
 import com.dzen.campfire.server.optimizers.OptimizerSponsor
 import com.dzen.campfire.server.tables.TSupport
 import com.sup.dev.java.libs.http_server.HttpServer
+import com.sup.dev.java.libs.json.Json
 import com.sup.dev.java.tools.ToolsDate
 import com.sup.dev.java.tools.ToolsThreads
 import com.sup.dev.java_pc.sql.Database
@@ -14,11 +16,15 @@ import com.sup.dev.java_pc.sql.SqlQueryUpdate
 object ControllerDonates {
 
     private val server = HttpServer(4051)
+    private val secretDonates = App.secrets.getJson("donates")?: Json()
+    private val secretField = secretDonates.getString("field")
+    private val secretValue = secretDonates.getString("value")
 
     fun start(){
         ToolsThreads.thread {
             server.start {
-                parseMessage(it.read().message.split("\n").toTypedArray())
+                val message = it.read().message
+                parseMessage(message.split("\n").toTypedArray())
                 it.sendOK()
                 it.close()
             }
@@ -32,10 +38,15 @@ object ControllerDonates {
         var accountId:Long? = null
         var donateId = 0L
 
+        var secretFieldFound = false
+
         for (s in array) {
             if (s.contains("notification_type=")){
                 val split = s.split("&")
                 for(ss in split){
+                    if(ss.contains("$secretField=") && ss.contains(secretValue)){
+                        secretFieldFound = true
+                    }
                     if(ss.contains("withdraw_amount=")){
                         val sp = ss.split("=")
                         if(sp.size>1) sum = (sp[1].toDouble() * 100).toLong()
@@ -53,7 +64,7 @@ object ControllerDonates {
             }
         }
 
-        if(accountId != null && sum != null && donateId != 0L) {
+        if(secretFieldFound && accountId != null && sum != null && donateId != 0L) {
             var text = if(array.isEmpty()) "" else array[0]
             for (s in array) text += "\n" + s
             addDonate(accountId, sum, text, donateId)
