@@ -31,6 +31,8 @@ class ERubricsMoveFandom : RRubricsMoveFandom(0, 0, 0, "") {
 
         if (! ControllerFandom.checkExist(fandomId))
             throw ApiException(API.ERROR_GONE, "Fandom does not exist")
+        if (! API.isLanguageExsit(languageId))
+            throw ApiException(API.ERROR_GONE, "Language does not exist")
     }
 
     override fun execute(): Response {
