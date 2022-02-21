@@ -52,10 +52,9 @@ object ControllerEmail {
 
     fun setPassword(accountId:Long, email:String, passwordSha512:String){
         Database.update("ControllerEmail.setPassword", SqlQueryUpdate(TAccountsEmails.NAME)
-                .where(TAccountsEmails.account_id, "=", accountId)
-                .whereValue(TAccountsEmails.account_email, "=", email)
-                .updateValue(TAccountsEmails.account_password, ToolsCryptography.bcrypt(passwordSha512))
-        )
+            .where(TAccountsEmails.account_id, "=", accountId)
+            .updateValue(TAccountsEmails.account_password, ToolsCryptography.bcrypt(passwordSha512))
+            .whereValue(TAccountsEmails.account_email, "=", email))
     }
 
 }
