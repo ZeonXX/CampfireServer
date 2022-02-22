@@ -3,16 +3,15 @@ package com.dzen.campfire.server.executors.fandoms
 import com.dzen.campfire.api.API
 import com.dzen.campfire.api.models.fandoms.Fandom
 import com.dzen.campfire.api.requests.fandoms.RFandomsGetAll
+import com.dzen.campfire.api.tools.ApiException
 import com.dzen.campfire.server.controllers.ControllerFandom
 import com.dzen.campfire.server.tables.TCollisions
 import com.dzen.campfire.server.tables.TFandoms
 import com.sup.dev.java.classes.items.Item2
-import com.dzen.campfire.api.tools.ApiException
 import com.sup.dev.java_pc.sql.Database
 import com.sup.dev.java_pc.sql.Sql
 import com.sup.dev.java_pc.sql.SqlQuerySelect
 import com.sup.dev.java_pc.sql.SqlWhere
-import java.util.*
 
 class EFandomsGetAll : RFandomsGetAll(0, 0, 0, 0, "", emptyArray(), emptyArray(),emptyArray(),emptyArray()) {
 
@@ -129,7 +128,7 @@ class EFandomsGetAll : RFandomsGetAll(0, 0, 0, 0, "", emptyArray(), emptyArray()
                 select.where(SqlWhere.WhereString(TFandoms.id + "=(SELECT ${TCollisions.owner_id} FROM ${TCollisions.NAME} " +
                         "WHERE ${TCollisions.collision_type}=$paramType AND " +
                         "${TCollisions.collision_id}=$genre AND " +
-                        "${TCollisions.owner_id}=${TFandoms.NAME}.${TFandoms.id} LIMIT 0,1)"))
+                        "${TCollisions.owner_id}=${TFandoms.NAME}.${TFandoms.id} ${Sql.LIMIT} 1)"))
             }
 
     }

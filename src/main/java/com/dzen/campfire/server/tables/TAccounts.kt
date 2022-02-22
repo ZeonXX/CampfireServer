@@ -36,15 +36,15 @@ object TAccounts {
 
     val FOLLOWS_COUNT = "(SELECT COUNT(*) FROM " + TCollisions.NAME + " WHERE " + TCollisions.owner_id + "=" + NAME + "." + id + " AND " + TCollisions.collision_type + "=" + API.COLLISION_ACCOUNT_FOLLOW + ")"
     val FOLLOWERS_COUNT = "(SELECT COUNT(*) FROM " + TCollisions.NAME + " WHERE " + TCollisions.collision_id + "=" + NAME + "." + id + " AND " + TCollisions.collision_type + "=" + API.COLLISION_ACCOUNT_FOLLOW + ")"
-    val STATUS = Sql.IFNULL("SELECT ${TCollisions.value_2} FROM ${TCollisions.NAME } WHERE ${TCollisions.owner_id}=$NAME.$id AND ${TCollisions.collision_type}=${API.COLLISION_ACCOUNT_STATUS} ${Sql.LIMIT} 0,1", "''")
+    val STATUS = Sql.IFNULL("SELECT ${TCollisions.value_2} FROM ${TCollisions.NAME } WHERE ${TCollisions.owner_id}=$NAME.$id AND ${TCollisions.collision_type}=${API.COLLISION_ACCOUNT_STATUS} ${Sql.LIMIT} 1", "''")
     val RATES_COUNT_NO_ANON = "(SELECT COUNT(*) FROM ${TPublicationsKarmaTransactions.NAME } WHERE ${TPublicationsKarmaTransactions.from_account_id}=$NAME.$id AND ${TPublicationsKarmaTransactions.anonymous}=0)"
     val WARNS_COUNT = Sql.IFNULL("SELECT COUNT(*) FROM " + TCollisions.NAME + " WHERE " + TCollisions.owner_id + "=" + NAME + "." + id + " AND " + TCollisions.collision_type + "=" + API.COLLISION_PUNISHMENTS_WARN, 0)
     val BANS_COUNT = Sql.IFNULL("SELECT COUNT(*) FROM " + TCollisions.NAME + " WHERE " + TCollisions.owner_id + "=" + NAME + "." + id + " AND " + TCollisions.collision_type + "=" + API.COLLISION_PUNISHMENTS_BAN, 0)
-    val AGE = Sql.IFNULL("SELECT ${TCollisions.value_1} FROM ${TCollisions.NAME } WHERE ${TCollisions.owner_id}=$NAME.$id AND ${TCollisions.collision_type}=${API.COLLISION_ACCOUNT_AGE} ${Sql.LIMIT} 0,1", 0)
-    val DESCRIPTION = Sql.IFNULL("SELECT ${TCollisions.value_2} FROM ${TCollisions.NAME } WHERE ${TCollisions.owner_id}=$NAME.$id AND ${TCollisions.collision_type}=${API.COLLISION_ACCOUNT_DESCRIPTION} ${Sql.LIMIT} 0,1", "''")
-    val LINKS = Sql.IFNULL("SELECT ${TCollisions.value_2} FROM ${TCollisions.NAME } WHERE ${TCollisions.owner_id}=$NAME.$id AND ${TCollisions.collision_type}=${API.COLLISION_ACCOUNT_LINKS} ${Sql.LIMIT} 0,1", "''")
-    fun NOTE(accountId:Long) = Sql.IFNULL("SELECT ${TCollisions.value_2} FROM ${TCollisions.NAME } WHERE ${TCollisions.owner_id}=$accountId AND ${TCollisions.collision_id}=$NAME.$id AND ${TCollisions.collision_type}=${API.COLLISION_ACCOUNT_NOTE} ${Sql.LIMIT} 0,1", "''")
-    val PINED_POST_ID = Sql.IFNULL("SELECT ${TCollisions.collision_id} FROM ${TCollisions.NAME } WHERE ${TCollisions.owner_id}=$NAME.$id AND ${TCollisions.collision_type}=${API.COLLISION_ACCOUNT_PINNED_POST} ${Sql.LIMIT} 0,1", 0)
+    val AGE = Sql.IFNULL("SELECT ${TCollisions.value_1} FROM ${TCollisions.NAME } WHERE ${TCollisions.owner_id}=$NAME.$id AND ${TCollisions.collision_type}=${API.COLLISION_ACCOUNT_AGE} ${Sql.LIMIT} 1", 0)
+    val DESCRIPTION = Sql.IFNULL("SELECT ${TCollisions.value_2} FROM ${TCollisions.NAME } WHERE ${TCollisions.owner_id}=$NAME.$id AND ${TCollisions.collision_type}=${API.COLLISION_ACCOUNT_DESCRIPTION} ${Sql.LIMIT} 1", "''")
+    val LINKS = Sql.IFNULL("SELECT ${TCollisions.value_2} FROM ${TCollisions.NAME } WHERE ${TCollisions.owner_id}=$NAME.$id AND ${TCollisions.collision_type}=${API.COLLISION_ACCOUNT_LINKS} ${Sql.LIMIT} 1", "''")
+    fun NOTE(accountId:Long) = Sql.IFNULL("SELECT ${TCollisions.value_2} FROM ${TCollisions.NAME } WHERE ${TCollisions.owner_id}=$accountId AND ${TCollisions.collision_id}=$NAME.$id AND ${TCollisions.collision_type}=${API.COLLISION_ACCOUNT_NOTE} ${Sql.LIMIT} 1", "''")
+    val PINED_POST_ID = Sql.IFNULL("SELECT ${TCollisions.collision_id} FROM ${TCollisions.NAME } WHERE ${TCollisions.owner_id}=$NAME.$id AND ${TCollisions.collision_type}=${API.COLLISION_ACCOUNT_PINNED_POST} ${Sql.LIMIT} 1", 0)
 
     fun isInFollowsList(accountId: Long): String {
         return "(SELECT COUNT(*) FROM " + TCollisions.NAME + " WHERE " + TCollisions.collision_id + "=" + NAME + "." + id + " AND " + TCollisions.owner_id + "=" + accountId + " AND " + TCollisions.collision_type + "=" + API.COLLISION_ACCOUNT_FOLLOW + ")"
