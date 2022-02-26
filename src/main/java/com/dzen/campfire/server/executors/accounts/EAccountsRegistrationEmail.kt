@@ -1,29 +1,23 @@
 package com.dzen.campfire.server.executors.accounts
 
 import com.dzen.campfire.api.API
-import com.dzen.campfire.api.models.chat.ChatTag
-import com.dzen.campfire.api.requests.accounts.RAccountsRegistration
 import com.dzen.campfire.api.requests.accounts.RAccountsRegistrationEmail
-import com.dzen.campfire.server.controllers.ControllerAccounts
-import com.dzen.campfire.server.controllers.ControllerChats
+import com.dzen.campfire.api.tools.ApiException
+import com.dzen.campfire.server.controllers.ControllerCaptcha
+import com.dzen.campfire.server.controllers.ControllerEmail
 import com.dzen.campfire.server.controllers.ControllerResources
 import com.dzen.campfire.server.tables.TAccounts
-import com.dzen.campfire.api.tools.ApiException
-import com.dzen.campfire.server.controllers.ControllerEmail
-import com.dzen.campfire.server.tables.TAccountsEmails
 import com.sup.dev.java.tools.ToolsFiles
 import com.sup.dev.java.tools.ToolsText
-import com.sup.dev.java_pc.google.GoogleAuth
 import com.sup.dev.java_pc.sql.Database
 import com.sup.dev.java_pc.sql.SqlQueryUpdate
-import com.sup.dev.java_pc.tools.ToolsImage
 
-class EAccountsRegistrationEmail : RAccountsRegistrationEmail("", "", 0) {
+class EAccountsRegistrationEmail : RAccountsRegistrationEmail("", "", 0, "") {
     @Throws(ApiException::class)
     override fun check() {
-        throw ApiException(E_EMAIL_EXIST)   //  Отключена регистрация по Email из-за простоты создания ботов
         if (!ToolsText.isValidEmailAddress(email)) throw RuntimeException("Invalid email [$email]")
         if(ControllerEmail.checkExist(email)) throw ApiException(E_EMAIL_EXIST)
+        if (!ControllerCaptcha.verify(captchaResp)) throw ApiException(E_CAPTCHA_FAILED)
     }
 
     override fun execute(): Response {
