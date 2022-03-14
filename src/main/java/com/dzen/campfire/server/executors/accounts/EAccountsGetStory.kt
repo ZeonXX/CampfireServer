@@ -2,9 +2,9 @@ package com.dzen.campfire.server.executors.accounts
 
 import com.dzen.campfire.api.API
 import com.dzen.campfire.api.requests.accounts.RAccountsGetStory
+import com.dzen.campfire.api.tools.ApiException
 import com.dzen.campfire.server.tables.TPublications
 import com.dzen.campfire.server.tables.TPublicationsKarmaTransactions
-import com.dzen.campfire.api.tools.ApiException
 import com.sup.dev.java_pc.sql.Database
 import com.sup.dev.java_pc.sql.Sql
 import com.sup.dev.java_pc.sql.SqlQuerySelect
@@ -21,25 +21,25 @@ class EAccountsGetStory : RAccountsGetStory(0) {
 
         val karmaPlus: Long = Database.select("EAccountsGetStory select_1", SqlQuerySelect(TPublicationsKarmaTransactions.NAME, Sql.SUM(TPublicationsKarmaTransactions.karma_count))
                 .where(TPublicationsKarmaTransactions.target_account_id, "=", accountId)
-                .where(TPublicationsKarmaTransactions.change_account_karma, "=", 1)
+                .where(TPublicationsKarmaTransactions.change_account_karma, "=", true)
                 .where(TPublicationsKarmaTransactions.karma_count, ">", 0)
         ).sumOrZero()
 
         val karmaMinus: Long = Database.select("EAccountsGetStory select_2", SqlQuerySelect(TPublicationsKarmaTransactions.NAME, Sql.SUM(TPublicationsKarmaTransactions.karma_count))
                 .where(TPublicationsKarmaTransactions.target_account_id, "=", accountId)
-                .where(TPublicationsKarmaTransactions.change_account_karma, "=", 1)
+                .where(TPublicationsKarmaTransactions.change_account_karma, "=", true)
                 .where(TPublicationsKarmaTransactions.karma_count, "<", 0)
         ).sumOrZero()
 
         val ratesPlus: Long = Database.select("EAccountsGetStory select_3", SqlQuerySelect(TPublicationsKarmaTransactions.NAME, Sql.SUM(TPublicationsKarmaTransactions.karma_count))
                 .where(TPublicationsKarmaTransactions.from_account_id, "=", accountId)
-                .where(TPublicationsKarmaTransactions.change_account_karma, "=", 1)
+                .where(TPublicationsKarmaTransactions.change_account_karma, "=", true)
                 .where(TPublicationsKarmaTransactions.karma_count, ">", 0)
         ).sumOrZero()
 
         val ratesMinus: Long = Database.select("EAccountsGetStory select_4", SqlQuerySelect(TPublicationsKarmaTransactions.NAME, Sql.SUM(TPublicationsKarmaTransactions.karma_count))
                 .where(TPublicationsKarmaTransactions.from_account_id, "=", accountId)
-                .where(TPublicationsKarmaTransactions.change_account_karma, "=", 1)
+                .where(TPublicationsKarmaTransactions.change_account_karma, "=", true)
                 .where(TPublicationsKarmaTransactions.karma_count, "<", 0)
         ).sumOrZero()
 

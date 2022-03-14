@@ -3,11 +3,11 @@ package com.dzen.campfire.server.controllers
 import com.dzen.campfire.api.API
 import com.dzen.campfire.api.models.notifications.publications.NotificationKarmaAdd
 import com.dzen.campfire.api.models.publications.Publication
+import com.dzen.campfire.api.tools.ApiAccount
 import com.dzen.campfire.server.tables.TAccounts
+import com.dzen.campfire.server.tables.TCollisions
 import com.dzen.campfire.server.tables.TPublications
 import com.dzen.campfire.server.tables.TPublicationsKarmaTransactions
-import com.dzen.campfire.api.tools.ApiAccount
-import com.dzen.campfire.server.tables.TCollisions
 import com.sup.dev.java_pc.sql.Database
 import com.sup.dev.java_pc.sql.Sql
 import com.sup.dev.java_pc.sql.SqlQuerySelect
@@ -34,7 +34,7 @@ object ControllerKarma {
                                         + TPublicationsKarmaTransactions.fandom_id + "=" + TCollisions.NAME + "." + TCollisions.collision_id
                                         + " AND " + TPublicationsKarmaTransactions.language_id + "=" + TCollisions.NAME + "." + TCollisions.collision_sub_id
                                         + " AND " + TPublicationsKarmaTransactions.target_account_id + "=" + TCollisions.NAME + "." + TCollisions.owner_id
-                                        + " AND " + TPublicationsKarmaTransactions.change_account_karma + "=1"
+                                        + " AND " + TPublicationsKarmaTransactions.change_account_karma + "=true"
                                         + " AND " + TPublicationsKarmaTransactions.date_create + ">" + (System.currentTimeMillis() - 1000L * 60L * 60L * 24L * 30L)
                                         + ")", "0"))
         if (accountId > 0L) updateFandoms.where(TCollisions.owner_id, "=", accountId)
@@ -46,7 +46,7 @@ object ControllerKarma {
                                 + TCollisions.owner_id + "=" + TAccounts.NAME + "." + TAccounts.id
                                 + " AND " + TCollisions.collision_type + "=" + API.COLLISION_KARMA_30
                                 + ")", "0"))
-                .update(TAccounts.karma_count_total, Sql.IFNULL("(SELECT ${Sql.SUM(TPublicationsKarmaTransactions.karma_count)}" + " FROM ${TPublicationsKarmaTransactions.NAME} " + "WHERE ${TPublicationsKarmaTransactions.target_account_id}=${TAccounts.NAME}.${TAccounts.id} AND ${TPublicationsKarmaTransactions.change_account_karma}=1)", 0))
+                .update(TAccounts.karma_count_total, Sql.IFNULL("(SELECT ${Sql.SUM(TPublicationsKarmaTransactions.karma_count)}" + " FROM ${TPublicationsKarmaTransactions.NAME} " + "WHERE ${TPublicationsKarmaTransactions.target_account_id}=${TAccounts.NAME}.${TAccounts.id} AND ${TPublicationsKarmaTransactions.change_account_karma}=true)", 0))
         if (accountId > 0L) updateProfile.where(TAccounts.id, "=", accountId)
 
         Database.update("ControllerKarma.recountKarma30 update_1", updateFandoms)
@@ -91,7 +91,7 @@ object ControllerKarma {
                     TPublicationsKarmaTransactions.date_create, System.currentTimeMillis(),
                     TPublicationsKarmaTransactions.publication_id, publicationId,
                     TPublicationsKarmaTransactions.karma_count, karmaCount,
-                    TPublicationsKarmaTransactions.change_account_karma, if (changeAccountKarma) 1 else 0,
+                    TPublicationsKarmaTransactions.change_account_karma, changeAccountKarma,
                     TPublicationsKarmaTransactions.karma_cof, karmaCof,
                     TPublicationsKarmaTransactions.anonymous, if (anon) 1 else 0
             )
