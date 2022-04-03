@@ -24,6 +24,8 @@ object App {
     val secretsConfig = secrets.getJson("config")!!
     val secretsKeys = secrets.getJson("keys")!!
     val test = secretsConfig.getString("build_type")!="release"
+    val hcaptchaSiteKey = secretsKeys.getString("hcaptcha_site_key")
+    val hcaptchaSecret = secretsKeys.getString("hcaptcha_secret")
 
     @JvmStatic
     fun main(args: Array<String>) {
