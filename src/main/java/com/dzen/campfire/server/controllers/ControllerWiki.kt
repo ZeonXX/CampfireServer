@@ -4,9 +4,9 @@ import com.dzen.campfire.api.API
 import com.dzen.campfire.api.models.wiki.WikiItem
 import com.dzen.campfire.api.models.wiki.WikiPages
 import com.dzen.campfire.api.models.wiki.WikiTitle
-import com.dzen.campfire.server.tables.TWikiTitles
 import com.dzen.campfire.server.tables.TWikiItems
 import com.dzen.campfire.server.tables.TWikiPages
+import com.dzen.campfire.server.tables.TWikiTitles
 import com.sup.dev.java.libs.json.Json
 import com.sup.dev.java_pc.sql.*
 
@@ -162,7 +162,8 @@ object ControllerWiki {
 
     fun getTitlesByItemId(itemId: Long): WikiTitle? {
         val v = parseSelectTitles(Database.select("ControllerWiki.getFromChangesByItemId",
-                instanceSelectTitles().where(TWikiTitles.item_id, "=", itemId)
+                instanceSelectTitles()
+                        .where(TWikiTitles.item_id, "=", itemId)
                         .sort(TWikiTitles.date_create, false)
                         .count(1)
         ))
@@ -172,7 +173,9 @@ object ControllerWiki {
     fun instanceSelectTitles() = SqlQuerySelect(TWikiTitles.NAME,
             TWikiTitles.id,
             TWikiTitles.item_data,
-            TWikiTitles.wiki_status
+            TWikiTitles.wiki_status,
+            TWikiTitles.priority,
+            TWikiTitles.fandom_id,
     )
 
     fun parseSelectTitles(v: ResultRows): Array<WikiTitle> {
@@ -182,6 +185,8 @@ object ControllerWiki {
             val id: Long = v.next()
             item.json(false, Json(v.next<String>()))
             item.wikiStatus = v.next()
+            item.priority = v.next()
+            item.fandomId = v.next()
             item.id = id    //  Важно! После json
             list.add(item)
         }
