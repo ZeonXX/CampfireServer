@@ -17,7 +17,7 @@ class EWikiListGet : RWikiListGet(0, 0, 0) {
         val select = ControllerWiki.instanceSelectTitles()
                 .where(TWikiTitles.ITEM_STATUS, "=", API.STATUS_PUBLIC)
                 .where(TWikiTitles.wiki_status, "=", API.STATUS_PUBLIC)
-                .sort(TWikiTitles.item_data, false)
+                .sort(TWikiTitles.priority, true)
                 .offset(offset)
                 .count(COUNT)
 

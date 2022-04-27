@@ -572,3 +572,5 @@ CREATE TABLE `wiki_titles` (
   KEY `parent_item_id` (`parent_item_id`),
   KEY `status` (`wiki_status`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2996 DEFAULT CHARSET=utf8mb4;
+
+alter table wiki_titles add priority int not null default 0;

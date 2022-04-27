@@ -16,7 +16,7 @@ object TWikiPages {
     val wiki_status = "wiki_status"
 
     val ITEM_STATUS = Sql.IFNULL("(SELECT ${TWikiItems.status} FROM ${TWikiItems.NAME} u WHERE u.${TWikiItems.id}=$NAME.$item_id)", 0)
-    val CREATOR_NAME = Sql.IFNULL("(SELECT ${TAccounts.name} FROM ${TAccounts.NAME} u WHERE u.${TAccounts.id}=$NAME.$creator_id)", 0)
+    val CREATOR_NAME = Sql.IFNULL("(SELECT ${TAccounts.name} FROM ${TAccounts.NAME} u WHERE u.${TAccounts.id}=$NAME.$creator_id)", "''")
     val CREATOR_IMAGE_ID = Sql.IFNULL("(SELECT ${TAccounts.img_id} FROM ${TAccounts.NAME} u WHERE u.${TAccounts.id}=$NAME.$creator_id)", 0)
 
 }

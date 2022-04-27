@@ -5,22 +5,23 @@ import com.dzen.campfire.server.optimizers.OptimizerStickersCount
 import com.dzen.campfire.server.tables.TAccounts
 import com.dzen.campfire.server.tables.TCollisions
 import com.sup.dev.java.libs.debug.info
-import com.sup.dev.java_pc.sql.*
+import com.sup.dev.java_pc.sql.Database
+import com.sup.dev.java_pc.sql.Sql
+import com.sup.dev.java_pc.sql.SqlQueryRemove
+import com.sup.dev.java_pc.sql.SqlQuerySelect
 
 object ControllerStickers {
 
     fun getStickersPacksCount(accountId:Long):Long{
        return Database.select("ControllerStickers select_stickers_count", SqlQuerySelect(TCollisions.NAME, Sql.COUNT)
                 .where(TCollisions.collision_type, "=", API.COLLISION_ACCOUNT_STICKERPACKS)
-                .where(TCollisions.owner_id, "=", accountId)
-                .sort(TCollisions.collision_date_create, false)).nextLongOrZero()
+                .where(TCollisions.owner_id, "=", accountId)).nextLongOrZero()
     }
 
     fun getStickersCount(accountId:Long):Long{
        return Database.select("ControllerStickers select_stickers_count", SqlQuerySelect(TCollisions.NAME, Sql.COUNT)
                 .where(TCollisions.collision_type, "=", API.COLLISION_ACCOUNT_STICKERS)
-                .where(TCollisions.owner_id, "=", accountId)
-                .sort(TCollisions.collision_date_create, false)).nextLongOrZero()
+                .where(TCollisions.owner_id, "=", accountId)).nextLongOrZero()
     }
 
     fun getStickersPacksIds(accountId:Long):Array<Long>{

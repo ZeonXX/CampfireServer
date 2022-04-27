@@ -1,7 +1,6 @@
 package com.dzen.campfire.server.controllers
 
 import com.dzen.campfire.api.API
-import com.dzen.campfire.api.models.account.Account
 import com.dzen.campfire.api.models.fandoms.Fandom
 import com.dzen.campfire.api.models.notifications.publications.NotificationFollowsPublication
 import com.dzen.campfire.api.models.notifications.publications.NotificationMention
@@ -434,7 +433,7 @@ object ControllerPublications {
         publication.parentPublicationId = v.next()
         publication.karmaCount = Sql.parseSum(v.next<Any>())
         publication.myKarma = v.next()
-        publication.closed = v.nextMayNull() ?: 0 != 0
+        publication.closed = (v.nextMayNull<Long>()?.toInt() ?: 0) != 0
         publication.jsonDB = Json(v.next<String>())
         publication.category = v.next()
         publication.status = v.next()

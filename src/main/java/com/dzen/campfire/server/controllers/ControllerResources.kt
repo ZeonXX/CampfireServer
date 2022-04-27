@@ -1,6 +1,6 @@
 package com.dzen.campfire.server.controllers
 
-import com.dzen.campfire.api_media.requests.*
+import com.dzen.campfire.api_media.requests.RResourcesPut
 import com.dzen.campfire.server.app.App
 import com.dzen.campfire.server.tables.TResources
 import com.sup.dev.java_pc.sql.*
@@ -11,7 +11,8 @@ object ControllerResources {
     val databasePassword = App.secretsConfig.getString("database_media_password")
     val databaseName = App.secretsConfig.getString("database_media_name")
     val databaseAddress = App.secretsConfig.getString("database_media_address")
-    val database = DatabasePool(databaseLogin, databasePassword, databaseName, databaseAddress, 8)
+    val database = DatabasePool(databaseLogin, databasePassword, databaseName, databaseAddress,
+                                poolSize = 8, oldMysql = true)
 
     //
     //  Methods

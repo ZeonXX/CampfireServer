@@ -482,7 +482,7 @@ object ControllerAccounts {
     }
 
     fun updateKarmaCount(accountId: Long, change: Long) {
-        updateCollisionIncr(accountId, change, API.COLLISION_ACCOUNT_KARMA_COUNT) { Database.select("ControllerAccounts.updateKarmaCount select", SqlQuerySelect(TPublicationsKarmaTransactions.NAME, "SUM(" + TPublicationsKarmaTransactions.karma_count + ")").where(TPublicationsKarmaTransactions.target_account_id, "=", accountId).where(TPublicationsKarmaTransactions.change_account_karma, "=", 1)).sumOrZero() }
+        updateCollisionIncr(accountId, change, API.COLLISION_ACCOUNT_KARMA_COUNT) { Database.select("ControllerAccounts.updateKarmaCount select", SqlQuerySelect(TPublicationsKarmaTransactions.NAME, "SUM(" + TPublicationsKarmaTransactions.karma_count + ")").where(TPublicationsKarmaTransactions.target_account_id, "=", accountId).where(TPublicationsKarmaTransactions.change_account_karma, "=", true)).sumOrZero() }
     }
 
     fun updateEnters(accountId: Long, change: Long) {
@@ -521,9 +521,9 @@ object ControllerAccounts {
 
     fun updateRates(accountId: Long, change: Long) {
         if (change == 0L) {
-            val count: Long = Database.select("ControllerAccounts.updateRates select_1", SqlQuerySelect(TPublicationsKarmaTransactions.NAME, Sql.COUNT).where(TPublicationsKarmaTransactions.target_account_id, "=", accountId).where(TPublicationsKarmaTransactions.karma_count, ">", 0).where(TPublicationsKarmaTransactions.change_account_karma, "=", 1)).nextLongOrZero()
+            val count: Long = Database.select("ControllerAccounts.updateRates select_1", SqlQuerySelect(TPublicationsKarmaTransactions.NAME, Sql.COUNT).where(TPublicationsKarmaTransactions.target_account_id, "=", accountId).where(TPublicationsKarmaTransactions.karma_count, ">", 0).where(TPublicationsKarmaTransactions.change_account_karma, "=", true)).nextLongOrZero()
             ControllerOptimizer.updateOrCreateCollision(accountId, API.COLLISION_ACCOUNT_UP_RATES, count)
-            val down: Long = Database.select("ControllerAccounts.updateRates select_2", SqlQuerySelect(TPublicationsKarmaTransactions.NAME, Sql.COUNT).where(TPublicationsKarmaTransactions.target_account_id, "=", accountId).where(TPublicationsKarmaTransactions.karma_count, "<", 0).where(TPublicationsKarmaTransactions.change_account_karma, "=", 1)).nextLongOrZero()
+            val down: Long = Database.select("ControllerAccounts.updateRates select_2", SqlQuerySelect(TPublicationsKarmaTransactions.NAME, Sql.COUNT).where(TPublicationsKarmaTransactions.target_account_id, "=", accountId).where(TPublicationsKarmaTransactions.karma_count, "<", 0).where(TPublicationsKarmaTransactions.change_account_karma, "=", true)).nextLongOrZero()
             ControllerOptimizer.updateOrCreateCollision(accountId, API.COLLISION_ACCOUNT_UP_OVER_DOWN_RATES, count - down)
         } else {
             val count = ControllerOptimizer.getCollision(accountId, API.COLLISION_ACCOUNT_UP_RATES)

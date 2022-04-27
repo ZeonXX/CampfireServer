@@ -15,6 +15,7 @@ object TWikiTitles {
     val type = "type"
     val creator_id = "creator_id"
     val wiki_status = "wiki_status"
+    val priority = "priority"
 
     val ITEM_STATUS = Sql.IFNULL("(SELECT ${TWikiItems.status} FROM ${TWikiItems.NAME} u WHERE u.${TWikiItems.id}=${NAME}.${item_id})", 0)
 

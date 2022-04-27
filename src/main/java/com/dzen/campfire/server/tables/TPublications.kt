@@ -50,7 +50,7 @@ object TPublications {
     val PARENT_PUBLICATION_FANDOM_ID = Sql.IFNULL("(SELECT $fandom_id FROM $NAME u WHERE u.$id=$NAME.$parent_publication_id)", 0)
     val PARENT_PUBLICATION_LANGUAGE_ID = Sql.IFNULL("(SELECT $language_id FROM $NAME u WHERE u.$id=$NAME.$parent_publication_id)", 0)
 
-    fun my_karma(accountId: Long) = Sql.IFNULL("(SELECT " + TPublicationsKarmaTransactions.karma_count + " FROM " + TPublicationsKarmaTransactions.NAME + " WHERE " + TPublicationsKarmaTransactions.publication_id + "=" + NAME + "." + id + " AND " + TPublicationsKarmaTransactions.from_account_id + "=" + accountId + " LIMIT 0,1)", "0")
+    fun my_karma(accountId: Long) = Sql.IFNULL("(SELECT " + TPublicationsKarmaTransactions.karma_count + " FROM " + TPublicationsKarmaTransactions.NAME + " WHERE " + TPublicationsKarmaTransactions.publication_id + "=" + NAME + "." + id + " AND " + TPublicationsKarmaTransactions.from_account_id + "=" + accountId + " ${Sql.LIMIT} 1)", "0")
 
     fun collisionsCount(collisionType: Long) ="(SELECT COUNT(*) FROM " + TCollisions.NAME + " WHERE " + TCollisions.owner_id + "=" + NAME + "." + id + " AND " + TCollisions.collision_type + "=" + collisionType + ")"
 
