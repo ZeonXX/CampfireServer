@@ -19,16 +19,16 @@ class EPostPagePollingGet : RPostPagePollingGet(0) {
     @Throws(ApiException::class)
     override fun execute(): Response {
 
-        var v = Database.select("EPostPagePollingGet select_1", SqlQuerySelect(TCollisions.NAME, TCollisions.collision_sub_id + " as sub",
+        var v = Database.select("EPostPagePollingGet select_1", SqlQuerySelect(TCollisions.NAME + " as c1", "c1." + TCollisions.collision_sub_id,
                 "(" +
-                        SqlQuerySelect(TCollisions.NAME, Sql.COUNT)
-                                .where(TCollisions.collision_id, "=", pollingId)
-                                .where(TCollisions.collision_sub_id, "=", "sub")
-                                .where(TCollisions.collision_type, "=", API.COLLISION_PAGE_POLLING_VOTE).toString()
+                        SqlQuerySelect(TCollisions.NAME + " as c2", Sql.COUNT)
+                                .where("c2." + TCollisions.collision_id, "=", pollingId)
+                                .where("c2." + TCollisions.collision_sub_id, "=", "c1." + TCollisions.collision_sub_id)
+                                .where("c2." + TCollisions.collision_type, "=", API.COLLISION_PAGE_POLLING_VOTE).toString()
                         + ")")
                 .setDistinct(true)
-                .where(TCollisions.collision_id, "=", pollingId)
-                .where(TCollisions.collision_type, "=", API.COLLISION_PAGE_POLLING_VOTE))
+                .where("c1." + TCollisions.collision_id, "=", pollingId)
+                .where("c1." + TCollisions.collision_type, "=", API.COLLISION_PAGE_POLLING_VOTE))
 
         val results = Array(v.rowsCount) { PagePolling.Result() }
         for (i in results.indices) {
