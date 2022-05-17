@@ -1,7 +1,6 @@
 package com.dzen.campfire.server.executors.accounts
 
 import com.dzen.campfire.api.requests.accounts.RAccountsGetAll
-import com.dzen.campfire.api.requests.accounts.RAccountsGetAllOnline
 import com.dzen.campfire.server.controllers.ControllerAccounts
 import com.dzen.campfire.server.tables.TAccounts
 import com.sup.dev.java_pc.sql.Database
@@ -17,7 +16,7 @@ class EAccountsGetAll : RAccountsGetAll() {
     override fun execute(): Response {
         if (username != null && username!!.isNotEmpty()) {
             return Response(ControllerAccounts.parseSelect(Database.select("EAccountsGetAll", ControllerAccounts.instanceSelect()
-                    .whereValue(SqlWhere.WhereLIKE(TAccounts.name), "%${Sql.mirror(username!!)}%")
+                    .whereValue(SqlWhere.WhereLIKE(TAccounts.name, false), "%${Sql.mirror(username!!)}%")
                     .offset_count(offset, COUNT))), false)
         } else {
             val follows = ControllerAccounts.getFollows(apiAccount.id, offset, COUNT)

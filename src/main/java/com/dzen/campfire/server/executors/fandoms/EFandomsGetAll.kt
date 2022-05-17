@@ -104,11 +104,11 @@ class EFandomsGetAll : RFandomsGetAll(0, 0, 0, 0, "", emptyArray(), emptyArray()
 
             val v = Database.select("EFandomsGetAll.loadSearch",SqlQuerySelect(TCollisions.NAME, TCollisions.owner_id)
                     .where(TCollisions.collision_type, "=", API.COLLISION_FANDOM_NAMES)
-                    .whereValue(SqlWhere.WhereLIKE(TCollisions.value_2), "%${Sql.mirror(name)}%"))
+                    .whereValue(SqlWhere.WhereLIKE(TCollisions.value_2, false), "%${Sql.mirror(name)}%"))
             val ids = Array<Long>(v.rowsCount){v.next()}
 
-            if(ids.isNotEmpty()) select.whereValue(SqlWhere.WhereString("(${SqlWhere.WhereLIKE(TFandoms.name).toQuery()} OR ${SqlWhere.WhereIN(TFandoms.id, ids).toQuery()})"), "%${name.replace("_", "\\_")}%")
-            else select.whereValue(SqlWhere.WhereLIKE(TFandoms.name), "%${Sql.mirror(name)}%")
+            if(ids.isNotEmpty()) select.whereValue(SqlWhere.WhereString("(${SqlWhere.WhereLIKE(TFandoms.name, true).toQuery()} OR ${SqlWhere.WhereIN(TFandoms.id, ids).toQuery()})"), "%${name.replace("_", "\\_")}%")
+            else select.whereValue(SqlWhere.WhereLIKE(TFandoms.name, false), "%${Sql.mirror(name)}%")
         }
 
         if(categoryId != 0L) select.where(TFandoms.fandom_category, "=", categoryId)
