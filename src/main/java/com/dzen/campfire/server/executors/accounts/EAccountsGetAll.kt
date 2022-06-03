@@ -16,7 +16,7 @@ class EAccountsGetAll : RAccountsGetAll() {
     override fun execute(): Response {
         if (username != null && username!!.isNotEmpty()) {
             return Response(ControllerAccounts.parseSelect(Database.select("EAccountsGetAll", ControllerAccounts.instanceSelect()
-                    .whereValue(SqlWhere.WhereLIKE(TAccounts.name), "%${Sql.mirror(username!!.toLowerCase())}%")
+                    .whereValue(SqlWhere.WhereLIKE(TAccounts.name, false), "%${Sql.mirror(username!!.toLowerCase())}%")
                     .offset_count(offset, COUNT))), false)
         } else {
             val follows = ControllerAccounts.getFollows(apiAccount.id, offset, COUNT)
