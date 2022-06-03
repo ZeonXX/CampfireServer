@@ -18,7 +18,6 @@ class EWikiItemMove : RWikiItemMove(0, 0, 0) {
     override fun check() {
         wikiTitleItem = ControllerWiki.getTitlesByItemId(itemId) ?: throw ApiException(API.ERROR_GONE)
         if (wikiTitleItem.wikiStatus != API.STATUS_PUBLIC) throw ApiException(E_BAD_STATUS)
-        if (wikiTitleItem.itemType != API.WIKI_TYPE_ARTICLE) throw ApiException(E_BAD_PAGE_INDEX)
 
         if (destinationId > 0) {
             val wikiTitleDest = ControllerWiki.getTitlesByItemId(destinationId)
@@ -27,6 +26,7 @@ class EWikiItemMove : RWikiItemMove(0, 0, 0) {
             if (wikiTitleDest.itemType != API.WIKI_TYPE_SECION) throw ApiException(E_BAD_PAGE_INDEX)
 
             if (wikiTitleItem.fandomId != wikiTitleDest.fandomId) throw ApiException(E_BAD_PAGE_INDEX)
+            if (destinationId == itemId) throw ApiException(E_BAD_PAGE_INDEX) // мне лень
         }
 
         ControllerFandom.checkCan(apiAccount, wikiTitleItem.fandomId, 1, API.LVL_MODERATOR_WIKI_EDIT)
