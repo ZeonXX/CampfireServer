@@ -12,15 +12,14 @@ import com.dzen.campfire.api.models.publications.events_admins.ApiEventAdminWarn
 import com.dzen.campfire.api.models.publications.events_user.ApiEventUserAdminBaned
 import com.dzen.campfire.api.models.publications.events_user.ApiEventUserAdminPunishmentRemove
 import com.dzen.campfire.api.models.publications.events_user.ApiEventUserAdminWarned
-import com.dzen.campfire.server.tables.*
-import com.sup.dev.java.classes.collections.AnyArray
 import com.dzen.campfire.api.tools.ApiAccount
 import com.dzen.campfire.api.tools.ApiException
 import com.dzen.campfire.server.optimizers.OptimizerEffects
 import com.dzen.campfire.server.optimizers.OptimizerSponsor
+import com.dzen.campfire.server.tables.*
+import com.sup.dev.java.classes.collections.AnyArray
 import com.sup.dev.java.libs.json.Json
 import com.sup.dev.java_pc.sql.*
-import java.lang.Exception
 
 
 object ControllerAccounts {
@@ -384,7 +383,7 @@ object ControllerAccounts {
 
     fun getByName(name: String): Long {
         val v = Database.select("ControllerAccounts.getByName", SqlQuerySelect(TAccounts.NAME, TAccounts.id)
-                .whereValue(TAccounts.name, "=", name))
+                .whereValue(Sql.LOWER(TAccounts.name), "=", name.toLowerCase()))
         return if (v.isEmpty) 0L else v.next()
     }
 
