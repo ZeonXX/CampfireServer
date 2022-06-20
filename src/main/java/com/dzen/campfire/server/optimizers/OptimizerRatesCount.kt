@@ -26,7 +26,7 @@ object OptimizerRatesCount {
 
     fun increment(accountId: Long) {
         synchronized(cash) {
-            cash[accountId] = (cash[accountId]?:0L) + 1
+            cash[accountId] = get(accountId) + 1
         }
     }
 
