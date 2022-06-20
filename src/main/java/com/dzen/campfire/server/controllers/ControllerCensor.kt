@@ -2,7 +2,7 @@ package com.dzen.campfire.server.controllers
 
 object ControllerCensor {
 
-    private val SPEC = "\"^%`\\|<>{}[] _/;@#$&+()*~., \"\\!?-"
+    private val SPEC = "\"^%`\\|<>{}[] _/;@#$&+()*~., \"\\!?-\n"
     private val words = ArrayList<Word>()
 
     fun start() {
