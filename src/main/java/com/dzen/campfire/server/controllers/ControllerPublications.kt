@@ -108,8 +108,10 @@ object ControllerPublications {
                     if (!names.contains(ss)) {
                         val id = Database.select("ControllerPublications.parseMentions", SqlQuerySelect(TAccounts.NAME, TAccounts.id).whereValue(TAccounts.name, "=", ss)).nextLongOrZero()
                         if (id > 0 && id != fromAccount.id && !exclude.contains(id)) {
-                            names.add(ss)
-                            ids.add(id)
+                            if (! ControllerCollisions.checkCollisionExist(fromAccount.id, id, API.COLLISION_ACCOUNT_BLACK_LIST_ACCOUNT)) {
+                                names.add(ss)
+                                ids.add(id)
+                            }
                         }
                     }
                 }
