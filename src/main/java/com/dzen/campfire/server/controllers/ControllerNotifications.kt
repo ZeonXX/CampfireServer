@@ -75,8 +75,19 @@ object ControllerNotifications {
             }
 
             val tokensS = ArrayList<String>()
+            val json = notification.json(true, Json())
+            val sent = hashSetOf<Long>()
             for (i in tokens) {
-                if(!notification.isNeedForcePush()){
+                if (sent.contains(i.a1)) continue
+                sent.add(i.a1)
+
+                val stream = App.streamServer.byAccount[i.a1]
+                if (stream != null) {
+                    stream.sendJson(json)
+                    continue
+                }
+
+                if (!notification.isNeedForcePush()) {
                     val accounts = App.accountProvider.getAccounts(i.a1)
                     var found = false
                     for (account in accounts) {
@@ -91,7 +102,6 @@ object ControllerNotifications {
                     tokensS.add(i.a2!!)
                 }
             }
-            val json = notification.json(true, Json())
             GoogleNotification.send(json.toString(), tokensS.toTypedArray())
         }
     }
