@@ -17,7 +17,7 @@ object ControllerMigrator {
                 if (i.serverFlag_WillUpload) ru(i.key, i.text)
             }
         }
-        uploadImages()
+//        uploadImages()
     }
 
     fun ru(key: String, text: String) {
