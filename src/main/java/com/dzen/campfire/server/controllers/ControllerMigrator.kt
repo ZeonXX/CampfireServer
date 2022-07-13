@@ -19,6 +19,7 @@ object ControllerMigrator {
                 if (i.serverFlag_WillUpload) ru(i.key, i.text)
             }
         }
+        uploadImages()
     }
 
     fun ru(key: String, text: String) {
@@ -163,13 +164,13 @@ object ControllerMigrator {
     //
 
     fun uploadImages() {
-       // val files = File("C:\\Users\\User\\Desktop\\xxx\\Аватарки").listFiles()
-       // var x = 0
-       // for (f in files) {
-       //      RResourcesPut(ToolsFiles.readFile(f), 0, 0, "bg")
-       //              .onComplete { System.err.println("${1 + x++} / ${files.size}   ${f.name} " + it.resourceId) }
-       //              .sendNow(ControllerResources.api!!)
-       // }
+        val files = File(App.secretsConfig.getString("patch_prefix"))
+            .resolve("../../res/images/bg/")
+        val list = arrayOf("bg_lvl_16.png", "bg_lvl_17.png", "bg_lvl_18.png", "bg_lvl_19.png", "bg_lvl_20.png")
+        for (name in list) {
+            val id = ControllerResources.put(ToolsFiles.readFile(files.resolve(name)), 0, "bg")
+            System.err.println("[uploadImages] $name | id: $id")
+        }
     }
 
 }

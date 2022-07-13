@@ -54,6 +54,15 @@ object ControllerResources {
        )
     }
 
+    fun put(resource: ByteArray?, publicationId: Long, tag: String): Long {
+        return database.insert("EResourcesPut 1", TResources.NAME,
+            TResources.image_bytes, resource,
+            TResources.publication_id, publicationId,
+            TResources.size, resource?.size ?: 0,
+            TResources.tag_s_1, tag,
+        )
+    }
+
     //
     //  Remove
     //
