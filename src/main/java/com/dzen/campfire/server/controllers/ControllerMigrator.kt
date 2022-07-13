@@ -6,15 +6,13 @@ import com.dzen.campfire.server.app.App
 import com.dzen.campfire.server.tables.TPublications
 import com.dzen.campfire.server.tables.TTranslates
 import com.sup.dev.java.libs.debug.info
-import com.sup.dev.java.tools.ToolsFiles
 import com.sup.dev.java_pc.sql.*
-import java.io.File
 
 
 object ControllerMigrator {
 
     fun start() {
-        if(!App.test) {
+        if (!App.test) {
             for (i in API_TRANSLATE.map.values) {
                 if (i.serverFlag_WillUpload) ru(i.key, i.text)
             }
@@ -28,17 +26,19 @@ object ControllerMigrator {
 
     fun x(languageId: Long, key: String, text: String) {
         info("Upload languageId[$languageId] key[$key], text[$text]")
-        val v = Database.select("xxx", SqlQuerySelect(TTranslates.NAME, TTranslates.id)
+        val v = Database.select(
+            "xxx", SqlQuerySelect(TTranslates.NAME, TTranslates.id)
                 .where(TTranslates.language_id, "=", languageId)
                 .whereValue(TTranslates.translate_key, "=", key)
         )
         if (!v.isEmpty) return
-        Database.insert("xxx", TTranslates.NAME,
-                TTranslates.language_id, languageId,
-                TTranslates.translate_key, key,
-                TTranslates.text, text,
-                TTranslates.hint, "",
-                TTranslates.project_key, API.PROJECT_KEY_CAMPFIRE
+        Database.insert(
+            "xxx", TTranslates.NAME,
+            TTranslates.language_id, languageId,
+            TTranslates.translate_key, key,
+            TTranslates.text, text,
+            TTranslates.hint, "",
+            TTranslates.project_key, API.PROJECT_KEY_CAMPFIRE
         )
     }
 
@@ -85,21 +85,28 @@ object ControllerMigrator {
     }
 
     fun indexingPosts(db: DatabaseInstance) {
-        val total = Database.select("indexImages count", SqlQuerySelect(TPublications.NAME, Sql.COUNT)
-                .where(TPublications.publication_type, "=", API.PUBLICATION_TYPE_POST)).nextLongOrZero()
+        val total = Database.select(
+            "indexImages count", SqlQuerySelect(TPublications.NAME, Sql.COUNT)
+                .where(TPublications.publication_type, "=", API.PUBLICATION_TYPE_POST)
+        ).nextLongOrZero()
         var offset = 0
         while (true) {
 
-            val array = ControllerPublications.parseSelect(Database.select("indexImages select", ControllerPublications.instanceSelect(1)
-                    .where(TPublications.publication_type, "=", API.PUBLICATION_TYPE_POST)
-                    .offset_count(offset, 100)))
+            val array = ControllerPublications.parseSelect(
+                Database.select(
+                    "indexImages select", ControllerPublications.instanceSelect(1)
+                        .where(TPublications.publication_type, "=", API.PUBLICATION_TYPE_POST)
+                        .offset_count(offset, 100)
+                )
+            )
             if (array.isEmpty()) return
             offset += array.size
 
             for (publication in array) {
                 val ids = publication.getResourcesList()
                 if (ids.isEmpty()) continue
-                db.update(SqlQueryUpdate("resources")
+                db.update(
+                    SqlQueryUpdate("resources")
                         .where(SqlWhere.WhereIN("id", ids))
                         .update("publication_id", publication.id)
                 )
@@ -164,13 +171,13 @@ object ControllerMigrator {
     //
 
     fun uploadImages() {
-        val files = File(App.secretsConfig.getString("patch_prefix"))
-            .resolve("../../res/images/bg/")
+        /*val files = File(App.secretsConfig.getString("patch_prefix"))
+            .resolve("upload/")
         val list = arrayOf("bg_lvl_16.png", "bg_lvl_17.png", "bg_lvl_18.png", "bg_lvl_19.png", "bg_lvl_20.png")
         for (name in list) {
             val id = ControllerResources.put(ToolsFiles.readFile(files.resolve(name)), 0, "bg")
             System.err.println("[uploadImages] $name | id: $id")
-        }
+        }*/
     }
 
 }

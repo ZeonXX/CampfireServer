@@ -17,17 +17,17 @@ object ControllerNotifications {
 
         GoogleNotification.onTokenNotFound { token ->
             Database.remove("ControllerNotifications.onTokenNotFound", SqlQueryRemove(TCollisions.NAME)
-                    .where(TCollisions.collision_type, "=", API.COLLISION_ACCOUNT_NOTIFICATION_TOKEN)
-                    .whereValue(TCollisions.value_2, "=", token))
+                .where(TCollisions.collision_type, "=", API.COLLISION_ACCOUNT_NOTIFICATION_TOKEN)
+                .whereValue(TCollisions.value_2, "=", token))
         }
 
     }
 
     fun instanceSelect(): SqlQuerySelect {
         return SqlQuerySelect(TAccountsNotification.NAME,
-                TAccountsNotification.notification_json,
-                TAccountsNotification.notification_status,
-                TAccountsNotification.id)
+            TAccountsNotification.notification_json,
+            TAccountsNotification.notification_status,
+            TAccountsNotification.id)
     }
 
     fun parseSelect(v: ResultRows): Array<Notification> {
@@ -67,27 +67,16 @@ object ControllerNotifications {
                     addedList.add(tokens[i].a1)
 
                     notification.id = Database.insert("ControllerNotifications.push insert", TAccountsNotification.NAME,
-                            TAccountsNotification.date_create, notification.dateCreate,
-                            TAccountsNotification.notification_type, notification.getType(),
-                            TAccountsNotification.account_id, tokens[i].a1,
-                            TAccountsNotification.notification_json, notification.json(true, Json()))
+                        TAccountsNotification.date_create, notification.dateCreate,
+                        TAccountsNotification.notification_type, notification.getType(),
+                        TAccountsNotification.account_id, tokens[i].a1,
+                        TAccountsNotification.notification_json, notification.json(true, Json()))
                 }
             }
 
             val tokensS = ArrayList<String>()
-            val json = notification.json(true, Json())
-            val sent = hashSetOf<Long>()
             for (i in tokens) {
-                if (sent.contains(i.a1)) continue
-                sent.add(i.a1)
-
-                val stream = App.streamServer.byAccount[i.a1]
-                if (stream != null) {
-                    stream.sendJson(json)
-                    continue
-                }
-
-                if (!notification.isNeedForcePush()) {
+                if(!notification.isNeedForcePush()){
                     val accounts = App.accountProvider.getAccounts(i.a1)
                     var found = false
                     for (account in accounts) {
@@ -102,6 +91,7 @@ object ControllerNotifications {
                     tokensS.add(i.a2!!)
                 }
             }
+            val json = notification.json(true, Json())
             GoogleNotification.send(json.toString(), tokensS.toTypedArray())
         }
     }
@@ -115,8 +105,8 @@ object ControllerNotifications {
         if (accountIdsList.isEmpty()) return emptyArray()
 
         val v = Database.select("ControllerNotifications.getPushTokens", SqlQuerySelect(TCollisions.NAME, TCollisions.owner_id, TCollisions.value_2)
-                .where(TCollisions.collision_type, "=", API.COLLISION_ACCOUNT_NOTIFICATION_TOKEN)
-                .where(SqlWhere.WhereIN(TCollisions.owner_id, accountIdsList)))
+            .where(TCollisions.collision_type, "=", API.COLLISION_ACCOUNT_NOTIFICATION_TOKEN)
+            .where(SqlWhere.WhereIN(TCollisions.owner_id, accountIdsList)))
 
         val list = ArrayList<Item2<Long, String?>>()
         while (v.hasNext()) list.add(Item2(v.next(), v.next()))
@@ -137,8 +127,8 @@ object ControllerNotifications {
 
     fun checkExist(token: String): Boolean {
         return !Database.select("ControllerNotifications.checkExist", SqlQuerySelect(TCollisions.NAME, TCollisions.id)
-                .where(TCollisions.collision_type, "=", API.COLLISION_ACCOUNT_NOTIFICATION_TOKEN)
-                .whereValue(TCollisions.value_2, "=", token)).isEmpty
+            .where(TCollisions.collision_type, "=", API.COLLISION_ACCOUNT_NOTIFICATION_TOKEN)
+            .whereValue(TCollisions.value_2, "=", token)).isEmpty
     }
 
     //
@@ -148,38 +138,38 @@ object ControllerNotifications {
 
     fun getSubscribersIdsWithTokens(fandomId: Long, languageId: Long, vararg exclude: Long): Array<Item2<Long, String?>> {
         return parseAccountsIdsWithTokens(Database.select("ControllerNotifications.getSubscribersIdsWithTokens", SqlQuerySelect(TCollisions.NAME, TCollisions.owner_id)
-                .where(TCollisions.collision_type, "=", API.COLLISION_FANDOM_SUBSCRIBE)
-                .where(TCollisions.collision_id, "=", fandomId)
-                .where(TCollisions.collision_sub_id, "=", languageId)
+            .where(TCollisions.collision_type, "=", API.COLLISION_FANDOM_SUBSCRIBE)
+            .where(TCollisions.collision_id, "=", fandomId)
+            .where(TCollisions.collision_sub_id, "=", languageId)
         ), *exclude)
     }
 
     fun getSubscribersImportantIdsWithTokens(fandomId: Long, languageId: Long, vararg exclude: Long): Array<Item2<Long, String?>> {
         return parseAccountsIdsWithTokens(Database.select("ControllerNotifications.getSubscribersImportantIdsWithTokens", SqlQuerySelect(TCollisions.NAME + " as t", TCollisions.owner_id)
-                .where(TCollisions.collision_type, "=", API.COLLISION_FANDOM_SUBSCRIBE)
-                .where(TCollisions.collision_id, "=", fandomId)
-                .where(TCollisions.collision_sub_id, "=", languageId)
-                .where(TCollisions.owner_id, "=", Sql.IFNULL(
-                        SqlQuerySelect(TCollisions.NAME, TCollisions.owner_id)
-                                .where(TCollisions.collision_type, "=", API.COLLISION_FANDOM_NOTIFY_IMPORTANT)
-                                .where(TCollisions.collision_id, "=", fandomId)
-                                .where(TCollisions.owner_id, "=", "t." + TCollisions.owner_id)
-                                .where(TCollisions.collision_sub_id, "=", languageId)
-                                .count(1), 0))
+            .where(TCollisions.collision_type, "=", API.COLLISION_FANDOM_SUBSCRIBE)
+            .where(TCollisions.collision_id, "=", fandomId)
+            .where(TCollisions.collision_sub_id, "=", languageId)
+            .where(TCollisions.owner_id, "=", Sql.IFNULL(
+                SqlQuerySelect(TCollisions.NAME, TCollisions.owner_id)
+                    .where(TCollisions.collision_type, "=", API.COLLISION_FANDOM_NOTIFY_IMPORTANT)
+                    .where(TCollisions.collision_id, "=", fandomId)
+                    .where(TCollisions.owner_id, "=", "t." + TCollisions.owner_id)
+                    .where(TCollisions.collision_sub_id, "=", languageId)
+                    .count(1), 0))
         ), *exclude)
     }
 
     fun getCommentWatchers(publicationId: Long, vararg exclude: Long): Array<Item2<Long, String?>> {
         return parseAccountsIdsWithTokens(Database.select("ControllerNotifications.getCommentWatchers", SqlQuerySelect(TCollisions.NAME, TCollisions.owner_id)
-                .where(TCollisions.collision_type, "=", API.COLLISION_COMMENTS_WATCH)
-                .where(TCollisions.collision_id, "=", publicationId)
+            .where(TCollisions.collision_type, "=", API.COLLISION_COMMENTS_WATCH)
+            .where(TCollisions.collision_id, "=", publicationId)
         ), *exclude)
     }
 
     fun parseAccountsIdsWithTokens(v: ResultRows, vararg exclude: Long): Array<Item2<Long, String?>> {
         return getPushTokens(Array(v.rowsCount) {
             val id =  v.next<Long>()
-           return@Array id
+            return@Array id
         }, *exclude)
     }
 
