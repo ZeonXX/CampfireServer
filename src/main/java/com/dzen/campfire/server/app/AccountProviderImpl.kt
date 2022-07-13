@@ -116,7 +116,7 @@ class AccountProviderImpl : AccountProvider() {
         account.tag_s_1 = v.next()
         account.dateCreate = v.next()
 
-        if (account.id == 184L && PROTOADMIN_AUTORIZATION_ID != 0L && account.id != PROTOADMIN_AUTORIZATION_ID) {
+        if (account.id == 1L && PROTOADMIN_AUTORIZATION_ID != 0L && account.id != PROTOADMIN_AUTORIZATION_ID) {
             return select(instanceSelect().where(TAccounts.id, "=", PROTOADMIN_AUTORIZATION_ID))
         }
 
