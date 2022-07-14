@@ -5,11 +5,14 @@ import com.dzen.campfire.api.models.chat.ChatTag
 import com.dzen.campfire.api.models.publications.chat.PublicationChatMessage
 import com.dzen.campfire.api.models.publications.stickers.PublicationSticker
 import com.dzen.campfire.api.requests.chat.RChatMessageCreate
-import com.dzen.campfire.server.controllers.*
-import com.dzen.campfire.server.tables.*
 import com.dzen.campfire.api.tools.ApiException
+import com.dzen.campfire.server.controllers.*
+import com.dzen.campfire.server.tables.TAccounts
+import com.dzen.campfire.server.tables.TChats
+import com.dzen.campfire.server.tables.TFandoms
 import com.sup.dev.java.libs.json.Json
 import com.sup.dev.java.tools.ToolsBytes
+import com.sup.dev.java.tools.ToolsCryptography
 import com.sup.dev.java_pc.tools.ToolsImage
 import java.nio.ByteBuffer
 import kotlin.math.abs
@@ -149,14 +152,18 @@ class EChatMessageCreate(
 
         if (quoteMessageId != 0L) {
             val quoteMessage = ControllerPublications.getPublication(quoteMessageId, apiAccount.id)
-            if (quoteMessage != null && quoteMessage is PublicationChatMessage) {
+            if (quoteMessage != null && quoteMessage is PublicationChatMessage && quoteMessage.chatTag() == tag) {
                 message.quoteId = quoteMessage.id
                 message.quoteText = quoteMessage.creator.name + ": " + quoteMessage.text
                 message.quoteCreatorName = quoteMessage.creator.name
                 if (message.quoteText.length > API.CHAT_MESSAGE_QUOTE_MAX_SIZE) message.quoteText = message.quoteText.substring(0, API.CHAT_MESSAGE_QUOTE_MAX_SIZE) + "..."
-                if (quoteMessage.imageIdArray.isNotEmpty()) message.quoteImages = quoteMessage.imageIdArray
-                else if (quoteMessage.resourceId > 0) message.quoteImages = Array(1) { quoteMessage.resourceId }
-                else if (quoteMessage.stickerId > 0) {
+                if (quoteMessage.imageIdArray.isNotEmpty()) {
+                    message.quoteImages = quoteMessage.imageIdArray
+                    message.quoteImagesPwd = quoteMessage.imagePwdArray
+                } else if (quoteMessage.resourceId > 0) {
+                    message.quoteImages = Array(1) { quoteMessage.resourceId }
+                    message.quoteImagesPwd = arrayOf(quoteMessage.imagePwd)
+                } else if (quoteMessage.stickerId > 0) {
                     message.quoteStickerId = quoteMessage.stickerId
                     message.quoteStickerImageId = quoteMessage.stickerImageId
                 } else message.quoteImages = emptyArray()
@@ -188,17 +195,22 @@ class EChatMessageCreate(
 
     private fun parseGif() {
         message.type = PublicationChatMessage.TYPE_GIF
-        message.gifId = ControllerResources.put(gif!!, API.RESOURCES_PUBLICATION_CHAT_MESSAGE)
-        message.resourceId = ControllerResources.put(imageArray!![0], API.RESOURCES_PUBLICATION_CHAT_MESSAGE)
+        message.imagePwd = ToolsCryptography.generateString(10)
+        message.gifId = ControllerResources.put(gif!!, API.RESOURCES_PUBLICATION_CHAT_MESSAGE, message.imagePwd)
+        message.resourceId = ControllerResources.put(imageArray!![0], API.RESOURCES_PUBLICATION_CHAT_MESSAGE, message.imagePwd)
     }
 
     private fun parseImage() {
         if (imageArray!!.size == 1) {
             message.type = PublicationChatMessage.TYPE_IMAGE
-            message.resourceId = ControllerResources.put(imageArray!![0], API.RESOURCES_PUBLICATION_CHAT_MESSAGE)
+            message.imagePwd = ToolsCryptography.generateString(10)
+            message.resourceId = ControllerResources.put(imageArray!![0], API.RESOURCES_PUBLICATION_CHAT_MESSAGE, message.imagePwd)
         } else {
             message.type = PublicationChatMessage.TYPE_IMAGES
-            message.imageIdArray = Array(imageArray!!.size) { ControllerResources.put(imageArray!![it], API.RESOURCES_PUBLICATION_CHAT_MESSAGE) }
+            message.imagePwdArray = Array(imageArray!!.size) { ToolsCryptography.generateString(10) }
+            message.imageIdArray = Array(imageArray!!.size) {
+                ControllerResources.put(imageArray!![it], API.RESOURCES_PUBLICATION_CHAT_MESSAGE, message.imagePwdArray[it])
+            }
         }
     }
 
