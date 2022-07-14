@@ -1,10 +1,9 @@
 package com.dzen.campfire.server.app
 
 import com.dzen.campfire.api.API
+import com.dzen.campfire.server.controllers.*
 import com.dzen.campfire.api.tools.server.ApiServer
 import com.dzen.campfire.api.tools.server.RequestFactory
-import com.dzen.campfire.api.tools.server.StreamServer
-import com.dzen.campfire.server.controllers.*
 import com.sup.dev.java.libs.debug.err
 import com.sup.dev.java.libs.json.Json
 import com.sup.dev.java.tools.ToolsDate
@@ -27,8 +26,6 @@ object App {
     val test = secretsConfig.getString("build_type")!="release"
     val hcaptchaSiteKey = secretsKeys.getString("hcaptcha_site_key")
     val hcaptchaSecret = secretsKeys.getString("hcaptcha_secret")
-
-    lateinit var streamServer: StreamServer
 
     @JvmStatic
     fun main(args: Array<String>) {
@@ -59,24 +56,15 @@ object App {
 
             val requestFactory = RequestFactory(jarFile, File("").absolutePath + "\\CampfireServer\\src\\main\\java")
 
-            val jks = ToolsFiles.readFile(keyFileJKS)
-            val bks = ToolsFiles.readFile(keyFileBKS)
             val apiServer = ApiServer(requestFactory,
-                    accountProvider,
-                    jks,
-                    bks,
-                    jksPassword,
-                    API.PORT_HTTPS,
-                    API.PORT_HTTP,
-                    API.PORT_CERTIFICATE,
-                    secretsBotsTokens,
-            )
-            streamServer = StreamServer(
                 accountProvider,
-                jks,
-                bks,
+                ToolsFiles.readFile(keyFileJKS),
+                ToolsFiles.readFile(keyFileBKS),
                 jksPassword,
-                API.PORT_STREAM
+                API.PORT_HTTPS,
+                API.PORT_HTTP,
+                API.PORT_CERTIFICATE,
+                secretsBotsTokens,
             )
 
             while (true) {
@@ -115,7 +103,6 @@ object App {
             System.err.println("------------ (\\/)._.(\\/) ------------")
 
             apiServer.startServer()
-            streamServer.startServer()
 
         } catch (th: Throwable) {
             err(th)
