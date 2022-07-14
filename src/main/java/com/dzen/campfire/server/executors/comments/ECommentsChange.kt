@@ -4,8 +4,8 @@ import com.dzen.campfire.api.API
 import com.dzen.campfire.api.models.publications.PublicationComment
 import com.dzen.campfire.api.models.publications.history.HistoryEditPublic
 import com.dzen.campfire.api.requests.comments.RCommentsChange
-import com.dzen.campfire.server.controllers.*
 import com.dzen.campfire.api.tools.ApiException
+import com.dzen.campfire.server.controllers.*
 
 class ECommentsChange : RCommentsChange(0, "", 0) {
 
@@ -15,6 +15,7 @@ class ECommentsChange : RCommentsChange(0, "", 0) {
     override fun check() {
         publication = ControllerPublications.getPublication(commentId, apiAccount.id) as PublicationComment?
         if (publication == null) throw ApiException(API.ERROR_GONE)
+        if (publication!!.creator.id != apiAccount.id) throw ApiException(API.ERROR_ACCESS) // see git blame
 
         text = text.trim { it <= ' ' }
         text = ControllerCensor.cens(text)
