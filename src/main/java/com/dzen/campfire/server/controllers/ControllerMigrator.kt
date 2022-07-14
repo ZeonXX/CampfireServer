@@ -168,7 +168,7 @@ object ControllerMigrator {
             .resolve("../../res/images/bg/")
         val list = arrayOf("bg_lvl_16.png", "bg_lvl_17.png", "bg_lvl_18.png", "bg_lvl_19.png", "bg_lvl_20.png")
         for (name in list) {
-            val id = ControllerResources.put(ToolsFiles.readFile(files.resolve(name)), 0, "bg")
+            val id = ControllerResources.putTag(ToolsFiles.readFile(files.resolve(name)), 0, "bg")
             System.err.println("[uploadImages] $name | id: $id")
         }
     }

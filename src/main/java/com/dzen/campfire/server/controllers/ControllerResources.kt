@@ -46,15 +46,17 @@ object ControllerResources {
         return resourceId
     }
 
-    fun put(resource: ByteArray?, publicationId:Long): Long {
+    @JvmOverloads
+    fun put(resource: ByteArray?, publicationId: Long, pwd: String = ""): Long {
        return database.insert("EResourcesPut 1", TResources.NAME,
                TResources.image_bytes, resource,
                TResources.publication_id, publicationId,
-               TResources.size, resource?.size ?: 0
+               TResources.size, resource?.size ?: 0,
+               TResources.pwd, pwd,
        )
     }
 
-    fun put(resource: ByteArray?, publicationId: Long, tag: String): Long {
+    fun putTag(resource: ByteArray?, publicationId: Long, tag: String): Long {
         return database.insert("EResourcesPut 1", TResources.NAME,
             TResources.image_bytes, resource,
             TResources.publication_id, publicationId,
