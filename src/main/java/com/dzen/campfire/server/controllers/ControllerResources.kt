@@ -46,6 +46,12 @@ object ControllerResources {
         return resourceId
     }
 
+    fun setPwd(resourceId: Long, pwd: String) {
+        database.update("ControllerResources.setPwd", SqlQueryUpdate(TResources.NAME)
+            .where(TResources.id, "=", resourceId)
+            .updateValue(TResources.pwd, pwd))
+    }
+
     @JvmOverloads
     fun put(resource: ByteArray?, publicationId: Long, pwd: String = ""): Long {
        return database.insert("EResourcesPut 1", TResources.NAME,
