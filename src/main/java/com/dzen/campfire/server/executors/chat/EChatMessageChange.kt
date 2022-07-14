@@ -5,8 +5,8 @@ import com.dzen.campfire.api.models.notifications.chat.NotificationChatMessageCh
 import com.dzen.campfire.api.models.publications.chat.PublicationChatMessage
 import com.dzen.campfire.api.models.publications.history.HistoryEditPublic
 import com.dzen.campfire.api.requests.chat.RChatMessageChange
-import com.dzen.campfire.server.controllers.*
 import com.dzen.campfire.api.tools.ApiException
+import com.dzen.campfire.server.controllers.*
 import com.sup.dev.java.libs.json.Json
 
 class EChatMessageChange : RChatMessageChange(0, 0, "") {
@@ -17,6 +17,7 @@ class EChatMessageChange : RChatMessageChange(0, 0, "") {
         text = ControllerCensor.cens(text)
         val publication = ControllerPublications.getPublication(publicationId, apiAccount.id) as PublicationChatMessage?
         if (publication == null) throw ApiException(API.ERROR_GONE)
+        if (publication.creator.id != apiAccount.id) throw ApiException(API.ERROR_ACCESS) // see git blame
         this.publication = publication
         if (text.length < API.CHAT_MESSAGE_TEXT_MIN_L || text.length > API.CHAT_MESSAGE_TEXT_MAX_L) throw ApiException(E_BAD_TEXT_SIZE)
         ControllerAccounts.checkAccountBanned(apiAccount.id, publication.fandom.id, publication.fandom.languageId)
@@ -38,10 +39,11 @@ class EChatMessageChange : RChatMessageChange(0, 0, "") {
 
         if (quoteMessageId != 0L) {
             val quoteUnit = ControllerPublications.getPublication(quoteMessageId, apiAccount.id)
-            if (quoteUnit != null && quoteUnit is PublicationChatMessage) {
+            if (quoteUnit != null && quoteUnit is PublicationChatMessage && quoteUnit.chatTag() == publication.chatTag()) {
                 publication.quoteId = quoteUnit.id
                 publication.quoteText = quoteUnit.creator.name + ": " + quoteUnit.text
-                publication.quoteImages = if (quoteUnit.resourceId > 0) Array(1) { quoteUnit.resourceId } else emptyArray()
+                publication.quoteImages = if (quoteUnit.resourceId > 0) Array(1) { quoteUnit.resourceId } else quoteUnit.imageIdArray
+                publication.quoteImagesPwd = if (quoteUnit.resourceId > 0) arrayOf(quoteUnit.imagePwd) else quoteUnit.imagePwdArray
             }
         }
 
