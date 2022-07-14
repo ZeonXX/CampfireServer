@@ -2,10 +2,14 @@ package com.dzen.campfire.server.controllers
 
 import com.dzen.campfire.api.API
 import com.dzen.campfire.api.API_TRANSLATE
+import com.dzen.campfire.api.models.publications.chat.PublicationChatMessage
 import com.dzen.campfire.server.app.App
 import com.dzen.campfire.server.tables.TPublications
 import com.dzen.campfire.server.tables.TTranslates
 import com.sup.dev.java.libs.debug.info
+import com.sup.dev.java.tools.ToolsCryptography
+import com.sup.dev.java.tools.ToolsFiles
+import com.sup.dev.java.tools.ToolsThreads
 import com.sup.dev.java_pc.sql.*
 
 
@@ -18,6 +22,45 @@ object ControllerMigrator {
             }
         }
 //        uploadImages()
+        ToolsThreads.thread {
+            ToolsThreads.sleep(5000)
+            addImagePasswords()
+        }
+    }
+
+    fun addImagePasswords() {
+        val total = Database.select("addImagePasswords count", SqlQuerySelect(TPublications.NAME, Sql.COUNT)
+            .where(TPublications.publication_type, "=", API.PUBLICATION_TYPE_CHAT_MESSAGE)).nextLongOrZero()
+        var offset = 0
+        while (true) {
+            val start = System.currentTimeMillis()
+
+            val array = ControllerPublications.parseSelect(Database.select("addImagePasswords select", ControllerPublications.instanceSelect(1)
+                .where(TPublications.publication_type, "=", API.PUBLICATION_TYPE_CHAT_MESSAGE)
+                .offset_count(offset, 100)))
+            if (array.isEmpty()) break
+            offset += array.size
+
+            for (publication in array) {
+                if (publication !is PublicationChatMessage) continue
+                if (publication.resourceId > 0 && publication.imagePwd.isEmpty()) {
+                    publication.imagePwd = ToolsCryptography.generateString(10)
+                    ControllerResources.setPwd(publication.resourceId, publication.imagePwd)
+                    ControllerPublications.replaceJson(publication.id, publication)
+                } else if (publication.imageIdArray.isNotEmpty() && publication.imagePwdArray.isEmpty()) {
+                    publication.imagePwdArray = Array(publication.imageIdArray.size) { ToolsCryptography.generateString(10) }
+                    for (i in publication.imageIdArray.indices) {
+                        ControllerResources.setPwd(publication.imageIdArray[i], publication.imagePwdArray[i])
+                    }
+                    ControllerPublications.replaceJson(publication.id, publication)
+                }
+            }
+
+            info("[ControllerMigrator] progress: $offset / $total in ${System.currentTimeMillis() - start}ms " +
+                    "| 600ms cooldown")
+            ToolsThreads.sleep(600)
+        }
+        info("[ControllerMigrator] done!")
     }
 
     fun ru(key: String, text: String) {
