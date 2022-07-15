@@ -23,10 +23,10 @@ object ControllerMigrator {
             }
         }
 //        uploadImages()
-        ToolsThreads.thread {
-            ToolsThreads.sleep(5000)
-            addImagePasswords()
-        }
+//        ToolsThreads.thread {
+//            ToolsThreads.sleep(5000)
+//            addImagePasswords()
+//        }
     }
 
     fun addImagePasswords() {
