@@ -144,6 +144,7 @@ object ControllerAccounts {
         }
 
         ControllerActivities.dropActivities(accountId)
+        ControllerSubThread.stopAllFor(accountId)
 
         return punishmentId
     }

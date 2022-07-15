@@ -168,7 +168,7 @@ object ControllerChats {
                 TPublications.tag_s_1, message.tag_s_1
         )
 
-        if (inSub) ControllerSubThread.inSub("EChatMessageCreate") { putMessageSub(apiAccount, message, tag) }
+        if (inSub) ControllerSubThread.inSub("EChatMessageCreate", message.creator.id) { putMessageSub(apiAccount, message, tag) }
         else putMessageSub(apiAccount, message, tag)
     }
 
