@@ -4,6 +4,7 @@ import com.dzen.campfire.api.API
 import com.dzen.campfire.api.models.quests.QuestDetails
 import com.dzen.campfire.api.requests.quests.RQuestsModify
 import com.dzen.campfire.api.tools.ApiException
+import com.dzen.campfire.server.controllers.ControllerAccounts
 import com.dzen.campfire.server.controllers.ControllerCensor
 import com.dzen.campfire.server.controllers.ControllerPublications
 import com.dzen.campfire.server.tables.TPublications
@@ -14,6 +15,9 @@ import com.sup.dev.java_pc.sql.SqlQueryUpdate
 
 class EQuestsModify : RQuestsModify(QuestDetails()) {
     override fun check() {
+        checkQuestEditable(edit.id, apiAccount)
+        ControllerAccounts.checkAccountBanned(apiAccount.id)
+
         edit.title = edit.title.trim()
         if (edit.title.length > API.QUEST_TITLE_MAX_L || edit.title.length < API.QUEST_TITLE_MIN_L)
             throw ApiException(E_INVALID_NAME, "bad length: ${edit.title.length}")

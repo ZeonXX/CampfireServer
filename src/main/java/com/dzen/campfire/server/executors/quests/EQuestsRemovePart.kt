@@ -4,6 +4,7 @@ import com.dzen.campfire.api.API
 import com.dzen.campfire.api.models.quests.QuestPart
 import com.dzen.campfire.api.requests.quests.RQuestsRemovePart
 import com.dzen.campfire.api.tools.ApiException
+import com.dzen.campfire.server.controllers.ControllerAccounts
 import com.dzen.campfire.server.controllers.ControllerUserQuests
 import com.dzen.campfire.server.tables.TQuestParts
 import com.sup.dev.java.libs.json.Json
@@ -14,6 +15,7 @@ import com.sup.dev.java_pc.sql.SqlQuerySelect
 class EQuestsRemovePart : RQuestsRemovePart(0, 0) {
     override fun check() {
         checkQuestEditable(questId, apiAccount)
+        ControllerAccounts.checkAccountBanned(apiAccount.id)
     }
 
     override fun execute(): Response {

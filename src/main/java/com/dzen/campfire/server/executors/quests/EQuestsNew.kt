@@ -5,6 +5,7 @@ import com.dzen.campfire.api.models.publications.history.HistoryCreate
 import com.dzen.campfire.api.models.quests.QuestDetails
 import com.dzen.campfire.api.requests.quests.RQuestsNew
 import com.dzen.campfire.api.tools.ApiException
+import com.dzen.campfire.server.controllers.ControllerAccounts
 import com.dzen.campfire.server.controllers.ControllerCensor
 import com.dzen.campfire.server.controllers.ControllerFandom
 import com.dzen.campfire.server.controllers.ControllerPublicationsHistory
@@ -15,6 +16,7 @@ import com.sup.dev.java_pc.sql.Database
 class EQuestsNew : RQuestsNew("", 0) {
     override fun check() {
         ControllerFandom.checkCan(apiAccount, API.LVL_CREATE_QUESTS)
+        ControllerAccounts.checkAccountBanned(apiAccount.id)
 
         title = title.trim()
         if (title.length > API.QUEST_TITLE_MAX_L || title.length < API.QUEST_TITLE_MIN_L)

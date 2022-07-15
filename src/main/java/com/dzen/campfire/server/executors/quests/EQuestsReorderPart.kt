@@ -1,6 +1,7 @@
 package com.dzen.campfire.server.executors.quests
 
 import com.dzen.campfire.api.requests.quests.RQuestsReorderPart
+import com.dzen.campfire.server.controllers.ControllerAccounts
 import com.dzen.campfire.server.tables.TQuestParts
 import com.dzen.campfire.server.tables.TWikiTitles
 import com.sup.dev.java_pc.sql.Database
@@ -10,6 +11,7 @@ import com.sup.dev.java_pc.sql.SqlQueryUpdate
 class EQuestsReorderPart : RQuestsReorderPart(0, 0, 0) {
     override fun check() {
         checkQuestEditable(questId, apiAccount)
+        ControllerAccounts.checkAccountBanned(apiAccount.id)
     }
 
     override fun execute(): Response {

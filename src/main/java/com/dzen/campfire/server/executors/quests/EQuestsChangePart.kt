@@ -5,6 +5,7 @@ import com.dzen.campfire.api.models.quests.QuestPart
 import com.dzen.campfire.api.models.quests.QuestPartUnknown
 import com.dzen.campfire.api.requests.quests.RQuestsChangePart
 import com.dzen.campfire.api.tools.ApiException
+import com.dzen.campfire.server.controllers.ControllerAccounts
 import com.dzen.campfire.server.controllers.ControllerUserQuests
 import com.dzen.campfire.server.tables.TQuestParts
 import com.sup.dev.java.libs.json.Json
@@ -17,6 +18,8 @@ class EQuestsChangePart : RQuestsChangePart(0, QuestPartUnknown()) {
     private var questId by Delegates.notNull<Long>()
 
     override fun check() {
+        ControllerAccounts.checkAccountBanned(apiAccount.id)
+
         val qp = Database.select("EQuestsChangePart_check", SqlQuerySelect(TQuestParts.NAME, TQuestParts.unit_id)
             .where(TQuestParts.id, "=", partId))
         if (qp.isEmpty) throw ApiException(API.ERROR_GONE)
