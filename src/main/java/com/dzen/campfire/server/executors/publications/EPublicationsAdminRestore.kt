@@ -9,18 +9,18 @@ import com.dzen.campfire.api.models.publications.events_admins.ApiEventAdminPubl
 import com.dzen.campfire.api.models.publications.events_user.ApiEventUserAdminModerationRejected
 import com.dzen.campfire.api.models.publications.events_user.ApiEventUserAdminPublicationRestored
 import com.dzen.campfire.api.models.publications.history.HistoryAdminNotBlock
-import com.dzen.campfire.api.models.publications.moderations.publications.ModerationBlock
 import com.dzen.campfire.api.models.publications.moderations.PublicationModeration
+import com.dzen.campfire.api.models.publications.moderations.publications.ModerationBlock
 import com.dzen.campfire.api.requests.publications.RPublicationsAdminRestore
+import com.dzen.campfire.api.tools.ApiException
 import com.dzen.campfire.server.controllers.*
 import com.dzen.campfire.server.tables.TAccounts
 import com.dzen.campfire.server.tables.TPublications
-import com.dzen.campfire.api.tools.ApiException
 import com.sup.dev.java.libs.json.Json
 import com.sup.dev.java_pc.sql.Database
 import com.sup.dev.java_pc.sql.SqlQueryUpdate
 
-class EPublicationsAdminRestore : RPublicationsAdminRestore(0, "") {
+class EPublicationsAdminRestore : RPublicationsAdminRestore(0, "", true) {
 
     private var publicationModeration: Publication? = null
     private var publication: Publication? = null
@@ -56,7 +56,7 @@ class EPublicationsAdminRestore : RPublicationsAdminRestore(0, "") {
             ControllerNotifications.push(publication!!.creator.id, notificationBlock)
         }
 
-        ControllerVahter.addAdminRejected(publicationModeration!!.creator.id)
+        if (vahter) ControllerVahter.addAdminRejected(publicationModeration!!.creator.id)
         ControllerAccounts.removePunishment(ControllerAccounts.getAccount(apiAccount.id)!!, comment, publicationModeration!!.tag_3)
 
         ((publicationModeration!! as PublicationModeration).moderation as ModerationBlock).checkAdminId = apiAccount.id

@@ -1,9 +1,9 @@
 package com.dzen.campfire.server.app
 
 import com.dzen.campfire.api.API
-import com.dzen.campfire.server.controllers.*
 import com.dzen.campfire.api.tools.server.ApiServer
 import com.dzen.campfire.api.tools.server.RequestFactory
+import com.dzen.campfire.server.controllers.*
 import com.sup.dev.java.libs.debug.err
 import com.sup.dev.java.libs.json.Json
 import com.sup.dev.java.tools.ToolsDate
@@ -83,20 +83,22 @@ object App {
             apiServer.statisticCollector = { key, time, version -> ControllerStatistic.logRequest(key, time, version) }
 
             ControllerNotifications.init()
-            System.err.println("Starting of migrator")
+            System.err.println("Starting migrator")
             ControllerMigrator.start()
-            System.err.println("Starting of demons [ControllerUpdater]")
+            System.err.println("Starting daemons [ControllerUpdater]")
             ControllerUpdater.start()
-            System.err.println("Starting of demons [ControllerGarbage]")
+            System.err.println("Starting daemons [ControllerGarbage]")
             ControllerGarbage.start()
-            System.err.println("Starting of demons [ControllerPending]")
+            System.err.println("Starting daemons [ControllerPending]")
             ControllerPending.start()
-            System.err.println("Starting of demons [ControllerDonates]")
+            System.err.println("Starting daemons [ControllerDonates]")
             ControllerDonates.start()
-            System.err.println("Starting of demons [ControllerCensor]")
+            System.err.println("Starting daemons [ControllerCensor]")
             ControllerCensor.start()
-            System.err.println("Starting of demons [ControllerServerTranslates]")
+            System.err.println("Starting daemons [ControllerServerTranslates]")
             ControllerServerTranslates.start()
+            System.err.println("Starting daemons [ControllerFirebase]")
+            ControllerFirebase.start()
 
             System.err.println("Update karma category")
             ControllerOptimizer.karmaCategoryUpdateIfNeed()
