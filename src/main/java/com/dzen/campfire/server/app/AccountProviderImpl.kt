@@ -2,10 +2,10 @@ package com.dzen.campfire.server.app
 
 import com.dzen.campfire.api.API
 import com.dzen.campfire.api.tools.ApiAccount
+import com.dzen.campfire.api.tools.server.AccountProvider
+import com.dzen.campfire.server.controllers.ControllerFirebase
 import com.dzen.campfire.server.controllers.ControllerOptimizer
 import com.dzen.campfire.server.tables.TAccounts
-import com.dzen.campfire.api.tools.server.AccountProvider
-import com.dzen.campfire.server.controllers.ControllerEmail
 import com.sup.dev.java.libs.debug.err
 import com.sup.dev.java_pc.google.GoogleAuth
 import com.sup.dev.java_pc.sql.Database
@@ -42,15 +42,19 @@ class AccountProviderImpl : AccountProvider() {
 
         if (token == null) return null
 
-        if(token.startsWith(API.LOGIN_EMAIL_PREFIX)){
+        if (token.startsWith(API.LOGIN_EMAIL_PREFIX + API.LOGIN_SPLITTER)) {
+            return null
+        } else if (token.startsWith(API.LOGIN_EMAIL2_PREFIX + API.LOGIN_SPLITTER)) {
             val split = token.split(API.LOGIN_SPLITTER)
-            val email = split[1]
-            val passwordSha512 = token.substring(API.LOGIN_EMAIL_PREFIX.length + API.LOGIN_SPLITTER.length + email.length + API.LOGIN_SPLITTER.length)
+            val fbToken = try { ControllerFirebase.readToken(split[1]) } catch (e: Exception) { return null }
+            if (!fbToken.isEmailVerified) return null
 
-            val accountId = ControllerEmail.getAccountId(email, passwordSha512)
+            var accountId = ControllerFirebase.getAccountId(fbToken.uid)
+            val account = select(instanceSelect().where(TAccounts.id, "=", accountId))
+            if (account == null) accountId = ControllerFirebase.createAccount(fbToken.uid)
 
-            return select(instanceSelect().where(TAccounts.id, "=", accountId))
-        }else{
+            return account ?: select(instanceSelect().where(TAccounts.id, "=", accountId))
+        } else {
             val googleId = GoogleAuth.getGoogleId(token)
 
             if (googleId == null) {

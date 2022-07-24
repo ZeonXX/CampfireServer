@@ -9,6 +9,7 @@ class EAccountsChangePassword : RAccountsChangePassword("", "", "") {
 
     @Throws(ApiException::class)
     override fun check() {
+        throw ApiException(API.ERROR_GONE)
         if (!ControllerEmail.checkExist(email)) throw ApiException(API.ERROR_GONE)
         if (ControllerEmail.getAccountId(email, oldPassword) != apiAccount.id) throw ApiException(API.ERROR_ACCESS)
     }

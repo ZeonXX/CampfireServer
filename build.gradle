@@ -1,11 +1,13 @@
 apply plugin: 'java-library'
 apply plugin: 'kotlin'
+apply plugin: 'application'
 
 dependencies {
     compile project(':CampfireApiMedia')
     compile project(':CampfireApi')
     compile project(':DevSupJava')
     compile project(':DevSupJavaPc')
+    implementation 'com.google.firebase:firebase-admin:9.0.0'
 }
 
 jar {
@@ -13,6 +15,10 @@ jar {
     from {
         configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
     }
+}
+
+application {
+    mainClass = 'com.dzen.campfire.server.app.App'
 }
 
 buildscript {

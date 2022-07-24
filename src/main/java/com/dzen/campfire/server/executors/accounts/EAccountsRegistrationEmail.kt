@@ -15,6 +15,7 @@ import com.sup.dev.java_pc.sql.SqlQueryUpdate
 class EAccountsRegistrationEmail : RAccountsRegistrationEmail("", "", 0, "") {
     @Throws(ApiException::class)
     override fun check() {
+        throw ApiException(API.ERROR_GONE)
         if (!ToolsText.isValidEmailAddress(email)) throw RuntimeException("Invalid email [$email]")
         if(ControllerEmail.checkExist(email)) throw ApiException(E_EMAIL_EXIST)
         if (!ControllerCaptcha.verify(captchaResp)) throw ApiException(E_CAPTCHA_FAILED)
