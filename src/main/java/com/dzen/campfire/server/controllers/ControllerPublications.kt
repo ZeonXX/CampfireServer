@@ -108,7 +108,7 @@ object ControllerPublications {
                     if (!names.contains(ss)) {
                         val id = Database.select("ControllerPublications.parseMentions", SqlQuerySelect(TAccounts.NAME, TAccounts.id).whereValue(TAccounts.name, "=", ss)).nextLongOrZero()
                         if (id > 0 && id != fromAccount.id && !exclude.contains(id)) {
-                            if (! ControllerCollisions.checkCollisionExist(fromAccount.id, id, API.COLLISION_ACCOUNT_BLACK_LIST_ACCOUNT)) {
+                            if (! ControllerCollisions.checkCollisionExist(id, fromAccount.id, API.COLLISION_ACCOUNT_BLACK_LIST_ACCOUNT)) {
                                 names.add(ss)
                                 ids.add(id)
                             }
@@ -177,6 +177,21 @@ object ControllerPublications {
         loadBestCommentsForPosts(accountId, posts)
         loadRubricsForPosts(posts)
         loadUserActivity(accountId, posts)
+        loadBlacklists(accountId, posts)
+    }
+
+    fun loadBlacklists(accountId: Long, pubs: Array<Publication>) {
+        val v = Database.select("ControllerPublications.loadBlacklists",
+            SqlQuerySelect(TCollisions.NAME, TCollisions.collision_id)
+                .where(TCollisions.collision_type, "=", API.COLLISION_ACCOUNT_BLACK_LIST_ACCOUNT)
+                .where(TCollisions.owner_id, "=", accountId))
+        if (v.isEmpty) return
+
+        val ids = Array<Long>(v.rowsCount) { v.next() }
+
+        for (pub in pubs) {
+            if (ids.contains(pub.creator.id)) pub.blacklisted = true
+        }
     }
 
     private fun loadUserActivity(accountId: Long, posts: Array<Publication>) {

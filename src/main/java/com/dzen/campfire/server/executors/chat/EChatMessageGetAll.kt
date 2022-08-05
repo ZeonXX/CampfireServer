@@ -2,14 +2,15 @@ package com.dzen.campfire.server.executors.chat
 
 import com.dzen.campfire.api.API
 import com.dzen.campfire.api.models.chat.ChatTag
+import com.dzen.campfire.api.models.publications.Publication
 import com.dzen.campfire.api.models.publications.chat.PublicationChatMessage
 import com.dzen.campfire.api.requests.chat.RChatMessageGetAll
+import com.dzen.campfire.api.tools.ApiException
 import com.dzen.campfire.server.controllers.ControllerChats
 import com.dzen.campfire.server.controllers.ControllerPublications
+import com.dzen.campfire.server.controllers.ControllerSubThread
 import com.dzen.campfire.server.tables.TChatsSubscriptions
 import com.dzen.campfire.server.tables.TPublications
-import com.dzen.campfire.api.tools.ApiException
-import com.dzen.campfire.server.controllers.ControllerSubThread
 import com.sup.dev.java_pc.sql.Database
 
 class EChatMessageGetAll : RChatMessageGetAll(ChatTag(), 0, false, 0) {
@@ -36,6 +37,8 @@ class EChatMessageGetAll : RChatMessageGetAll(ChatTag(), 0, false, 0) {
         for (i in select_1) list.add(i)
         list.add(targetMessage as PublicationChatMessage)
         for (i in select_2) list.add(i)
+
+        ControllerPublications.loadBlacklists(apiAccount.id, list.map { it as Publication }.toTypedArray())
 
         return Response(list.toTypedArray())
     }
