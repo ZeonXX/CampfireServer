@@ -33,7 +33,7 @@ class EQuestsChangePart : RQuestsChangePart(0, QuestPartUnknown()) {
             .where(TQuestParts.id, "=", partId))
             .next<String>()
         val oldPart = QuestPart.instance(Json(oldPartText))
-        ControllerUserQuests.partClean(oldPart)
+        ControllerUserQuests.partClean(oldPart, part)
 
         ControllerUserQuests.censorAndUploadPart(questId, part)
         val newPartText = part.json(true, Json()).toString()

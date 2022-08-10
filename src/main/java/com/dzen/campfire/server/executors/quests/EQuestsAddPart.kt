@@ -30,8 +30,8 @@ fun checkQuestEditable(questId: Long, apiAccount: ApiAccount) {
 
 class EQuestsAddPart : RQuestsAddPart(0, emptyArray()) {
     override fun check() {
-        checkQuestEditable(questId, apiAccount)
         ControllerAccounts.checkAccountBanned(apiAccount.id)
+        checkQuestEditable(questId, apiAccount)
 
         val partCount = Database.select(
             "EQuestsAddPart 1", SqlQuerySelect(TQuestParts.NAME, Sql.COUNT)
@@ -53,7 +53,7 @@ class EQuestsAddPart : RQuestsAddPart(0, emptyArray()) {
                 .where(TQuestParts.unit_id, "=", questId)
                 .sort(TQuestParts.part_order, false)
                 .count(1)
-        ).nextMayNull<Long>() ?: 0
+        ).nextMayNullOrNull<Int>()?.toLong() ?: 0
 
         for (part in parts) {
             ControllerUserQuests.insertPart(++order, questId, part)

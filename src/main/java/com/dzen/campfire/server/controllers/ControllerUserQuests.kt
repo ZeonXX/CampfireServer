@@ -6,11 +6,13 @@ object ControllerUserQuests {
             is QuestEffectVibrate -> {
                 if (effect.times < 0 || effect.times > API.QUEST_EFFECT_VIBRATE_COUNT_MAX)
                     return false
-                if (effect.length < 0 || effect.length > API.QUEST_EFFECT_VIBRATE_LENGTH_MAX)
+                if (effect.length < 1 || effect.length > API.QUEST_EFFECT_VIBRATE_LENGTH_MAX)
                     return false
                 if (effect.delayStart < 0 || effect.delayStart > API.QUEST_EFFECT_VIBRATE_DELAY_START_MAX)
                     return false
-                if (effect.delayBetween < 0 || effect.delayBetween > API.QUEST_EFFECT_VIBRATE_DELAY_BETWEEN_MAX)
+                val min = if (effect.times == 0) API.QUEST_EFFECT_VIBRATE_DELAY_BETWEEN_INF_MIN
+                          else API.QUEST_EFFECT_VIBRATE_DELAY_BETWEEN_MIN
+                if (effect.delayBetween < min || effect.delayBetween > API.QUEST_EFFECT_VIBRATE_DELAY_BETWEEN_MAX)
                     return false
             }
             is QuestEffectBox -> {
@@ -52,6 +54,7 @@ object ControllerUserQuests {
         return true
     }
     private fun checkButtons(buttons: Array<QuestButton>): Boolean {
+        if (buttons.isEmpty()) return false
         if (buttons.size > API.QUEST_TEXT_BUTTONS_MAX) return false
         for (button in buttons) if (!checkButton(button)) return false
         return true
@@ -71,8 +74,9 @@ object ControllerUserQuests {
     private fun checkQuestAction(details: QuestDetails, part: QuestPartAction): Boolean {
         val variable = details.variables.find { it.id == part.varId } ?: return false
         when (part.actionType) {
-            API.QUEST_ACTION_SET_LITERAL ->
+            API.QUEST_ACTION_SET_LITERAL, API.QUEST_ACTION_ADD_LITERAL -> {
                 if (!checkVariableValue(variable.type, part.sArg)) return false
+            }
             API.QUEST_ACTION_SET_RANDOM -> {
                 if (variable.type != API.QUEST_TYPE_NUMBER) return false
                 if (part.lArg1 >= part.lArg2) return false
@@ -81,13 +85,9 @@ object ControllerUserQuests {
                 val var2 = details.variables.find { it.id == part.lArg1 } ?: return false
                 if (variable.type != var2.type) return false
             }
-            API.QUEST_ACTION_ADD_LITERAL -> {
-                if (variable.type != API.QUEST_TYPE_NUMBER) return false
-            }
             API.QUEST_ACTION_ADD_ANOTHER -> {
                 val var2 = details.variables.find { it.id == part.lArg1 } ?: return false
-                if (variable.type != API.QUEST_TYPE_NUMBER) return false
-                if (var2.type != API.QUEST_TYPE_NUMBER) return false
+                if (variable.type != var2.type) return false
             }
             API.QUEST_ACTION_SET_ARANDOM -> {
                 val var2 = details.variables.find { it.id == part.lArg1 } ?: return false
@@ -95,6 +95,11 @@ object ControllerUserQuests {
                 if (variable.type != API.QUEST_TYPE_NUMBER) return false
                 if (var2.type != API.QUEST_TYPE_NUMBER) return false
                 if (var3.type != API.QUEST_TYPE_NUMBER) return false
+            }
+            API.QUEST_ACTION_MULTIPLY, API.QUEST_ACTION_DIVIDE,
+            API.QUEST_ACTION_BIT_AND, API.QUEST_ACTION_BIT_OR -> {
+                val var2 = details.variables.find { it.id == part.lArg1 } ?: return false
+                if (var2.type != API.QUEST_TYPE_NUMBER) return false
             }
             else -> return false
         }
@@ -109,6 +114,7 @@ object ControllerUserQuests {
             API.QUEST_CONDITION_VALUE_VAR -> details.variables.find { it.id == cv.value }?.type
             else -> null
         }
+
         val leftType = condToType(part.leftValue)
         val rightType = condToType(part.leftValue)
         when (part.cond) {
@@ -123,7 +129,7 @@ object ControllerUserQuests {
             else -> return false
         }
 
-        if (part.falseJumpId < -1 || part.trueJumpId < -1) return false
+        if (part.falseJumpId < -2 || part.trueJumpId < -2) return false
         return true
     }
 
@@ -148,11 +154,10 @@ object ControllerUserQuests {
         return true
     }
 
-    fun partClean(part: QuestPart) {
+    fun partClean(part: QuestPart, newPart: QuestPart? = null) {
         when (part) {
             is QuestPartText -> {
-                ControllerResources.remove(part.imageId)
-                ControllerResources.remove(part.gifId)
+                if ((newPart as? QuestPartText?)?.imageId != part.imageId) ControllerResources.remove(part.imageId)
             }
         }
     }
@@ -171,8 +176,6 @@ object ControllerUserQuests {
 
                 if (part.insertBytes != null)
                     part.imageId = ControllerResources.put(part.insertBytes, questId)
-                if (part.insertGifBytes != null)
-                    part.gifId = ControllerResources.put(part.insertGifBytes, questId)
             }
             is QuestPartCondition -> {
                 part.leftValue.sValue = part.leftValue.sValue.censorNoFormat()
