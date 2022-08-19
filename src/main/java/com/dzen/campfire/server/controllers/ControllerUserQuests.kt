@@ -74,20 +74,27 @@ object ControllerUserQuests {
     private fun checkQuestAction(details: QuestDetails, part: QuestPartAction): Boolean {
         val variable = details.variables.find { it.id == part.varId } ?: return false
         when (part.actionType) {
-            API.QUEST_ACTION_SET_LITERAL, API.QUEST_ACTION_ADD_LITERAL -> {
+            API.QUEST_ACTION_SET_LITERAL -> {
                 if (!checkVariableValue(variable.type, part.sArg)) return false
             }
             API.QUEST_ACTION_SET_RANDOM -> {
-                if (variable.type != API.QUEST_TYPE_NUMBER) return false
-                if (part.lArg1 >= part.lArg2) return false
+                if (variable.type != API.QUEST_TYPE_NUMBER &&
+                    variable.type != API.QUEST_TYPE_BOOL) return false
+                if (variable.type == API.QUEST_TYPE_NUMBER &&
+                    part.lArg1 >= part.lArg2) return false
             }
             API.QUEST_ACTION_SET_ANOTHER -> {
                 val var2 = details.variables.find { it.id == part.lArg1 } ?: return false
                 if (variable.type != var2.type) return false
             }
+            API.QUEST_ACTION_ADD_LITERAL -> {
+                if (variable.type != API.QUEST_TYPE_BOOL &&
+                    !checkVariableValue(variable.type, part.sArg)) return false
+            }
             API.QUEST_ACTION_ADD_ANOTHER -> {
                 val var2 = details.variables.find { it.id == part.lArg1 } ?: return false
                 if (variable.type != var2.type) return false
+                if (variable.type == API.QUEST_TYPE_BOOL) return false
             }
             API.QUEST_ACTION_SET_ARANDOM -> {
                 val var2 = details.variables.find { it.id == part.lArg1 } ?: return false
