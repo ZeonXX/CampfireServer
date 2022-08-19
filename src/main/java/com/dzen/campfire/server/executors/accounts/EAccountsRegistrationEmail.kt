@@ -3,6 +3,7 @@ package com.dzen.campfire.server.executors.accounts
 import com.dzen.campfire.api.API
 import com.dzen.campfire.api.requests.accounts.RAccountsRegistrationEmail
 import com.dzen.campfire.api.tools.ApiException
+import com.dzen.campfire.server.app.App
 import com.dzen.campfire.server.controllers.ControllerCaptcha
 import com.dzen.campfire.server.controllers.ControllerEmail
 import com.dzen.campfire.server.controllers.ControllerResources
@@ -23,7 +24,7 @@ class EAccountsRegistrationEmail : RAccountsRegistrationEmail("", "", 0, "") {
 
     override fun execute(): Response {
 
-        var image = ToolsFiles.readFileSalient("campfire/res/def_image.png")
+        var image = ToolsFiles.readFileSalient("${App.patchPrefix}res/def_image.png")
         if(image == null) image = ToolsFiles.readFileSalient("CampfireServer/res/def_image.png")
         val imgId = ControllerResources.put(image!!, API.RESOURCES_PUBLICATION_DATABASE_LINKED)
 

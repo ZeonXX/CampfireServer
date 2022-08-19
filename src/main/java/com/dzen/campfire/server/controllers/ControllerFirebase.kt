@@ -82,7 +82,7 @@ object ControllerFirebase {
     fun createAccount(uid: String): Long {
         if (getAccountId(uid) != 0L) return 0
 
-        var image = ToolsFiles.readFileSalient("campfire/res/def_image.png")
+        var image = ToolsFiles.readFileSalient("${App.patchPrefix}res/def_image.png")
         if (image == null) image = ToolsFiles.readFileSalient("CampfireServer/res/def_image.png")
         val imgId = ControllerResources.put(image!!, API.RESOURCES_PUBLICATION_DATABASE_LINKED)
 

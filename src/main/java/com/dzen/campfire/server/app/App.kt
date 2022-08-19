@@ -26,11 +26,11 @@ object App {
     val test = secretsConfig.getString("build_type")!="release"
     val hcaptchaSiteKey = secretsKeys.getString("hcaptcha_site_key")
     val hcaptchaSecret = secretsKeys.getString("hcaptcha_secret")
+    val patchPrefix = secretsConfig.getString("patch_prefix")
 
     @JvmStatic
     fun main(args: Array<String>) {
 
-        val patchPrefix = secretsConfig.getString("patch_prefix")
         val databaseLogin = secretsConfig.getString("database_login")
         val databasePassword = secretsConfig.getString("database_password")
         val databaseName = secretsConfig.getString("database_name")
@@ -43,7 +43,7 @@ object App {
 
         val keyFileJKS = File("secrets/Certificate.jks")
         val keyFileBKS = File("secrets/Certificate.bks")
-        val jarFile = "${patchPrefix}CampfireServer.jar"
+        val jarFile = "${patchPrefix}lib/CampfireServer.jar"
 
         try {
             System.err.println("Sayzen Studio")

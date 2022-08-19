@@ -8,6 +8,7 @@ import com.dzen.campfire.server.controllers.ControllerChats
 import com.dzen.campfire.server.controllers.ControllerResources
 import com.dzen.campfire.server.tables.TAccounts
 import com.dzen.campfire.api.tools.ApiException
+import com.dzen.campfire.server.app.App
 import com.sup.dev.java.tools.ToolsFiles
 import com.sup.dev.java_pc.google.GoogleAuth
 import com.sup.dev.java_pc.sql.Database
@@ -39,7 +40,7 @@ class EAccountsRegistration : RAccountsRegistration(0, null) {
 
     override fun execute(): Response {
 
-        if (image == null) image = ToolsFiles.readFileSalient("campfire/res/def_image.png")
+        if (image == null) image = ToolsFiles.readFileSalient("${App.patchPrefix}res/def_image.png")
         val imgId = ControllerResources.put(image!!, API.RESOURCES_PUBLICATION_DATABASE_LINKED)
 
         val accountId = Database.insert("EAccountsRegistration insert",TAccounts.NAME,
