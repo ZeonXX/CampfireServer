@@ -1,11 +1,14 @@
 package com.dzen.campfire.server.controllers
 
+import com.dzen.campfire.api.API
+import com.dzen.campfire.api.tools.ApiException
+import com.dzen.campfire.api.tools.server.IControllerResources
 import com.dzen.campfire.api_media.requests.RResourcesPut
 import com.dzen.campfire.server.app.App
 import com.dzen.campfire.server.tables.TResources
 import com.sup.dev.java_pc.sql.*
 
-object ControllerResources {
+object ControllerResources : IControllerResources {
 
     val databaseLogin = App.secretsConfig.getString("database_media_login")
     val databasePassword = App.secretsConfig.getString("database_media_password")
@@ -46,14 +49,23 @@ object ControllerResources {
         return resourceId
     }
 
+    override fun get(resourceId: Long): ByteArray {
+        val select = SqlQuerySelect(TResources.NAME, TResources.image_bytes)
+        select.where(TResources.id, "=", resourceId)
+        val v = database.select("EResourcesGet", select)
+
+        if (v.isEmpty) throw ApiException(API.ERROR_GONE)
+
+        return v.next()
+    }
+
     fun setPwd(resourceId: Long, pwd: String) {
         database.update("ControllerResources.setPwd", SqlQueryUpdate(TResources.NAME)
             .where(TResources.id, "=", resourceId)
             .updateValue(TResources.pwd, pwd))
     }
 
-    @JvmOverloads
-    fun put(resource: ByteArray?, publicationId: Long, pwd: String = ""): Long {
+    override fun put(resource: ByteArray?, publicationId: Long, pwd: String): Long {
        return database.insert("EResourcesPut 1", TResources.NAME,
                TResources.image_bytes, resource,
                TResources.publication_id, publicationId,

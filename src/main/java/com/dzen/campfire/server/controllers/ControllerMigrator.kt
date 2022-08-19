@@ -38,12 +38,12 @@ object ControllerMigrator {
         ControllerResources.replace(
             API_RESOURCES.CAMPFIRE_IMAGE_4,
             ToolsFiles.readFile(File(App.secretsConfig.getString("patch_prefix"))
-                .resolve("../../res/images/cf_images/anon.png")),
+                .resolve("../../../../res/images/cf_images/anon.png")),
             0
         )
         System.err.println("[ControllerMigrations] bg_30.png | id: ${ControllerResources.putTag(
             ToolsFiles.readFile(File(App.secretsConfig.getString("patch_prefix"))
-                .resolve("../../res/images/bg/bg_30.png")),
+                .resolve("../../../../res/images/bg/bg_30.png")),
             0,
             "bg"
         )}")

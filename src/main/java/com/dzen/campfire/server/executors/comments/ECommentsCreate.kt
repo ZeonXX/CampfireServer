@@ -1,21 +1,23 @@
 package com.dzen.campfire.server.executors.comments
 
 import com.dzen.campfire.api.API
-import com.dzen.campfire.api.models.account.Account
-import com.dzen.campfire.api.models.publications.PublicationComment
 import com.dzen.campfire.api.models.notifications.comments.NotificationComment
 import com.dzen.campfire.api.models.notifications.comments.NotificationCommentAnswer
 import com.dzen.campfire.api.models.publications.Publication
+import com.dzen.campfire.api.models.publications.PublicationComment
 import com.dzen.campfire.api.models.publications.history.HistoryCreate
 import com.dzen.campfire.api.models.publications.stickers.PublicationSticker
 import com.dzen.campfire.api.requests.comments.RCommentsCreate
-import com.dzen.campfire.server.controllers.*
-import com.dzen.campfire.server.tables.TPublications
 import com.dzen.campfire.api.tools.ApiException
+import com.dzen.campfire.server.controllers.*
+import com.dzen.campfire.server.tables.TCollisions
+import com.dzen.campfire.server.tables.TPublications
 import com.sup.dev.java.libs.json.Json
 import com.sup.dev.java.tools.ToolsBytes
 import com.sup.dev.java_pc.sql.Database
+import com.sup.dev.java_pc.sql.SqlQuerySelect
 import com.sup.dev.java_pc.sql.SqlQueryUpdate
+import com.sup.dev.java_pc.sql.SqlWhere
 import com.sup.dev.java_pc.tools.ToolsImage
 
 class ECommentsCreate : RCommentsCreate(0, "", null, null, 0, false, 0, 0) {
@@ -169,7 +171,7 @@ class ECommentsCreate : RCommentsCreate(0, "", null, null, 0, false, 0, 0) {
 
     private fun notifications() {
 
-        if (parentComment.id != 0L && apiAccount.id != parentComment.creator.id) {
+        if (parentComment.id != 0L && apiAccount.id != parentComment.creator.id && !ControllerCollisions.checkCollisionExist(parentComment.creator.id, apiAccount.id, API.COLLISION_ACCOUNT_BLACK_LIST_ACCOUNT)) {
             val notification = NotificationCommentAnswer(apiAccount.imageId, publicationId, comment.id, apiAccount.id, apiAccount.sex, apiAccount.name, publication!!.publicationType, publication!!.tag_s_1, comment.text, comment.imageId, comment.imageIdArray, comment.stickerId, ControllerPublications.getMaskText(parentComment!!), ControllerPublications.getMaskPageType(parentComment!!))
             ControllerNotifications.push(parentComment.creator.id, notification)
         }
@@ -179,9 +181,15 @@ class ECommentsCreate : RCommentsCreate(0, "", null, null, 0, false, 0, 0) {
 
         val tokens = ControllerNotifications.getCommentWatchers(publicationId, apiAccount.id, parentComment.creator.id)
 
+        val v = Database.select("ECommentsCreate.notifications", SqlQuerySelect(TCollisions.NAME, TCollisions.owner_id)
+            .where(SqlWhere.WhereIN(TCollisions.owner_id, tokens.map { it.a1 }.toTypedArray()))
+            .where(TCollisions.collision_type, "=", API.COLLISION_ACCOUNT_BLACK_LIST_ACCOUNT)
+            .where(TCollisions.collision_id, "=", apiAccount.id))
+        val excludeBL: Array<Long> = Array(v.rowsCount) { v.next() }
+
         val notification = NotificationComment(apiAccount.imageId, publicationId, comment.id, apiAccount.id, apiAccount.sex, apiAccount.name, publication!!.publicationType, publication!!.creator.id, publication!!.tag_s_1, comment.text, comment.imageId, comment.imageIdArray, publication!!.fandom.name, publicationName, comment.stickerId, ControllerPublications.getMaskText(publication!!), ControllerPublications.getMaskPageType(publication!!))
 
-        ControllerNotifications.push(notification, tokens)
+        ControllerNotifications.push(notification, tokens.filterNot { excludeBL.contains(it.a1) }.toTypedArray())
     }
 
     private fun parseGif() {

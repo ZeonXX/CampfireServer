@@ -3,9 +3,9 @@ package com.dzen.campfire.server.executors.comments
 import com.dzen.campfire.api.API
 import com.dzen.campfire.api.models.publications.PublicationComment
 import com.dzen.campfire.api.requests.comments.RCommentsGetAll
+import com.dzen.campfire.api.tools.ApiException
 import com.dzen.campfire.server.controllers.ControllerPublications
 import com.dzen.campfire.server.tables.TPublications
-import com.dzen.campfire.api.tools.ApiException
 import com.sup.dev.java_pc.sql.Database
 
 class ECommentsGetAll : RCommentsGetAll(0, 0, false, false) {
@@ -36,6 +36,7 @@ class ECommentsGetAll : RCommentsGetAll(0, 0, false, false) {
         val v = Database.select("ECommentsGetAll",select)
 
         val publications = ControllerPublications.parseSelect(v)
+        ControllerPublications.loadBlacklists(apiAccount.id, publications)
 
         if(startFromBottom) {
             return Response(Array(publications.size) { publications[publications.size - it - 1] as PublicationComment })
