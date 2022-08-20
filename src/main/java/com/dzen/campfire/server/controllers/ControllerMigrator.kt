@@ -34,6 +34,53 @@ object ControllerMigrator {
 //            ToolsThreads.sleep(5000)
 //            addImagePasswords()
 //        }
+        migrateToFirebase()
+    }
+
+    private fun migrateToFirebase() {
+        val total = Database.select("migrateToFirebase 1", SqlQuerySelect(TAccountsEmails.NAME, Sql.COUNT))
+            .nextLongOrZero()
+
+        info("[ControllerMigrations] starting migration to firebase email accounts. $total accounts to migrate")
+        var offset = 0
+        var v: ResultRows
+        val auth = FirebaseAuth.getInstance(ControllerFirebase.app)
+        while (true) {
+            v = Database.select("migrateToFirebase 2", SqlQuerySelect(TAccountsEmails.NAME, TAccountsEmails.account_id, TAccountsEmails.account_email, TAccountsEmails.account_password)
+                .offset_count(offset, 500))
+            if (v.isEmpty) break
+
+            offset += v.rowsCount
+
+            val import = mutableListOf<ImportUserRecord>()
+
+            while (v.hasNext()) {
+                val accountId = v.next<Long>()
+                val accountEmail = v.next<String>()
+                val accountPwd = v.next<String>()
+
+                import.add(ImportUserRecord.builder()
+                    .setUid("migrated$accountId")
+                    .setEmail(accountEmail)
+                    .setPasswordHash(accountPwd.toByteArray())
+                    .setEmailVerified(true) // or they're gonna get deleted
+                    .putCustomClaim("migratedFrom", accountId)
+                    .build())
+
+                try {
+                    ControllerFirebase.setUid(accountId, "migrated$accountId")
+                } catch (e: Exception) {
+                    err("[ControllerMigrator] setUid failed for $accountId")
+                }
+            }
+
+            val result = auth.importUsers(import, UserImportOptions.withHash(Bcrypt.getInstance()))
+            for (error in result.errors) {
+                err("[ControllerMigrator] failed to migrate user at index ${error.index}: ${error.reason}")
+            }
+            info("[ControllerMigrator] migrated ${result.successCount} users, ${result.failureCount} failures")
+        }
+        info("[ControllerMigrator] migration done! please don't forget to remove this from ControllerMigrator")
     }
 
     fun addImagePasswords() {
