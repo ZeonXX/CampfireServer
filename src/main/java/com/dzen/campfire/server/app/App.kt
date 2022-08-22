@@ -37,8 +37,7 @@ object App {
         val databaseAddress = secretsConfig.getString("database_address")
 
         val googleNotificationKey = secretsKeys.getString("google_notification_key")
-        val googleAuthKeyId = secretsKeys.getString("google_auth_key_id")
-        val googleAuthKeySecret = secretsKeys.getString("google_auth_key_secret")
+        val googleAuth = secretsKeys.get<Array<GoogleAuth.GoogleAuthCreds>>("google_auth")!!
         val jksPassword = secretsKeys.getString("jks_password")
 
         val keyFileJKS = File("secrets/Certificate.jks")
@@ -52,7 +51,7 @@ object App {
             System.err.println("API Version: " + API.VERSION)
 
             GoogleNotification.init(googleNotificationKey, arrayOf("https://push.33rd.dev/push"))
-            GoogleAuth.init(googleAuthKeyId, googleAuthKeySecret)
+            GoogleAuth.init(googleAuth)
 
             val requestFactory = RequestFactory(jarFile, File("").absolutePath + "\\CampfireServer\\src\\main\\java")
 

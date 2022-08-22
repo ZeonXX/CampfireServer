@@ -54,6 +54,12 @@ class AccountProviderImpl : AccountProvider() {
             if (account == null) accountId = ControllerFirebase.createAccount(fbToken.uid)
 
             return account ?: select(instanceSelect().where(TAccounts.id, "=", accountId))
+        } else if (token.startsWith(API.LOGIN_GOOGLE_PREFIX + API.LOGIN_SPLITTER)) {
+            val split = token.split(API.LOGIN_SPLITTER)
+            if (split.size != 3) return null
+
+            val googleId = GoogleAuth.getGoogleId(split[2], split[1].toIntOrNull() ?: return null)
+            return select(instanceSelect().whereValue(TAccounts.google_id, "=", googleId ?: return null))
         } else {
             val googleId = GoogleAuth.getGoogleId(token)
 
