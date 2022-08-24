@@ -37,7 +37,7 @@ object App {
         val databaseAddress = secretsConfig.getString("database_address")
 
         val googleNotificationKey = secretsKeys.getString("google_notification_key")
-        val googleAuth = secretsKeys.m(false, "google_auth", Array<GoogleAuth.GoogleAuthCreds>::class)!!
+        val googleAuth = secretsKeys.m(false, "google_auth", arrayOf(), Array<GoogleAuth.GoogleAuthCreds>::class)!!
         val jksPassword = secretsKeys.getString("jks_password")
 
         val keyFileJKS = File("secrets/Certificate.jks")
