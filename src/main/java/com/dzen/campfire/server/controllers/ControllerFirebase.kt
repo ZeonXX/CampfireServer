@@ -80,13 +80,19 @@ object ControllerFirebase {
     ).takeIf { !it.isEmpty }?.nextMayNull()
 
     fun createAccount(uid: String): Long {
+
+        if (true) {
+            return 0
+        }
+
         if (getAccountId(uid) != 0L) return 0
 
         var image = ToolsFiles.readFileSalient("${App.patchPrefix}res/def_image.png")
         if (image == null) image = ToolsFiles.readFileSalient("CampfireServer/res/def_image.png")
         val imgId = ControllerResources.put(image!!, API.RESOURCES_PUBLICATION_DATABASE_LINKED)
 
-        val accountId = Database.insert("ControllerFirebase.createAccount 1", TAccounts.NAME,
+        val accountId = Database.insert(
+            "ControllerFirebase.createAccount 1", TAccounts.NAME,
             TAccounts.google_id, "",
             TAccounts.date_create, System.currentTimeMillis(),
             TAccounts.name, System.currentTimeMillis(),
@@ -97,11 +103,14 @@ object ControllerFirebase {
             TAccounts.refresh_token_date_create, 0L,
             TAccounts.account_settings, ""
         )
-        Database.update("ControllerFirebase.createAccount 2", SqlQueryUpdate(TAccounts.NAME)
-            .updateValue(TAccounts.name, "user#$accountId")
-            .where(TAccounts.id, "=", accountId))
+        Database.update(
+            "ControllerFirebase.createAccount 2", SqlQueryUpdate(TAccounts.NAME)
+                .updateValue(TAccounts.name, "user#$accountId")
+                .where(TAccounts.id, "=", accountId)
+        )
 
-        Database.insert("ControllerFirebase.createAccount 3", TAccountsFirebase.NAME,
+        Database.insert(
+            "ControllerFirebase.createAccount 3", TAccountsFirebase.NAME,
             TAccountsFirebase.account_id, accountId,
             TAccountsFirebase.firebase_uid, uid,
         )
@@ -111,7 +120,8 @@ object ControllerFirebase {
 
     fun setUid(accountId: Long, uid: String) {
         if (getUid(accountId) != null) throw ApiException(API.ERROR_ALREADY)
-        Database.insert("ControllerFirebase.setUid", TAccountsFirebase.NAME,
+        Database.insert(
+            "ControllerFirebase.setUid", TAccountsFirebase.NAME,
             TAccountsFirebase.account_id, accountId,
             TAccountsFirebase.firebase_uid, uid,
         )
