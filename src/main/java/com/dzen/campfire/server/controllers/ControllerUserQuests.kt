@@ -36,9 +36,11 @@ object ControllerUserQuests {
     }
 
     private fun checkInput(details: QuestDetails, input: QuestInput): Boolean {
+		if (input.hint.isEmpty()) return false
         if (input.hint.length > API.QUEST_INPUT_HINT_MAX_L) return false
-        if (!checkVariableValue(input.type, input.defaultValue)) return false
-        if (details.variables.indexOfFirst { it.id == input.varId } == -1) return false
+        if (input.defaultValue.isNotEmpty() &&
+			!checkVariableValue(input.type, input.defaultValue)) return false
+        if (details.variablesMap[input.varId] != null) return false
         return true
     }
     private fun checkInputs(details: QuestDetails, inputs: Array<QuestInput>): Boolean {
@@ -48,6 +50,7 @@ object ControllerUserQuests {
     }
 
     private fun checkButton(button: QuestButton): Boolean {
+		if (button.label.isEmpty()) return false
         if (button.label.length > API.QUEST_BUTTON_LABEL_MAX_L) return false
         if (!API.QUEST_BUTTON_COLORS.contains(button.color)) return false
         if (button.jumpToId < -2) return false
@@ -72,7 +75,7 @@ object ControllerUserQuests {
     }
 
     private fun checkQuestAction(details: QuestDetails, part: QuestPartAction): Boolean {
-        val variable = details.variables.find { it.id == part.varId } ?: return false
+        val variable = details.variablesMap!![part.varId] ?: return false
         when (part.actionType) {
             API.QUEST_ACTION_SET_LITERAL -> {
                 if (!checkVariableValue(variable.type, part.sArg)) return false
@@ -84,7 +87,7 @@ object ControllerUserQuests {
                     part.lArg1 >= part.lArg2) return false
             }
             API.QUEST_ACTION_SET_ANOTHER -> {
-                val var2 = details.variables.find { it.id == part.lArg1 } ?: return false
+                val var2 = details.variablesMap!![part.lArg1] ?: return false
                 if (variable.type != var2.type) return false
             }
             API.QUEST_ACTION_ADD_LITERAL -> {
@@ -92,20 +95,20 @@ object ControllerUserQuests {
                     !checkVariableValue(variable.type, part.sArg)) return false
             }
             API.QUEST_ACTION_ADD_ANOTHER -> {
-                val var2 = details.variables.find { it.id == part.lArg1 } ?: return false
+                val var2 = details.variablesMap!![part.lArg1] ?: return false
                 if (variable.type != var2.type) return false
                 if (variable.type == API.QUEST_TYPE_BOOL) return false
             }
             API.QUEST_ACTION_SET_ARANDOM -> {
-                val var2 = details.variables.find { it.id == part.lArg1 } ?: return false
-                val var3 = details.variables.find { it.id == part.lArg2 } ?: return false
+                val var2 = details.variablesMap!![part.lArg1] ?: return false
+                val var3 = details.variablesMap!![part.lArg2] ?: return false
                 if (variable.type != API.QUEST_TYPE_NUMBER) return false
                 if (var2.type != API.QUEST_TYPE_NUMBER) return false
                 if (var3.type != API.QUEST_TYPE_NUMBER) return false
             }
             API.QUEST_ACTION_MULTIPLY, API.QUEST_ACTION_DIVIDE,
             API.QUEST_ACTION_BIT_AND, API.QUEST_ACTION_BIT_OR -> {
-                val var2 = details.variables.find { it.id == part.lArg1 } ?: return false
+                val var2 = details.variablesMap!![part.lArg1] ?: return false
                 if (var2.type != API.QUEST_TYPE_NUMBER) return false
             }
             else -> return false
@@ -118,7 +121,7 @@ object ControllerUserQuests {
             API.QUEST_CONDITION_VALUE_LITERAL_LONG -> API.QUEST_TYPE_NUMBER
             API.QUEST_CONDITION_VALUE_LITERAL_TEXT -> API.QUEST_TYPE_TEXT
             API.QUEST_CONDITION_VALUE_LITERAL_BOOL -> API.QUEST_TYPE_BOOL
-            API.QUEST_CONDITION_VALUE_VAR -> details.variables.find { it.id == cv.value }?.type
+            API.QUEST_CONDITION_VALUE_VAR -> details.variablesMap!![cv.value]?.type
             else -> null
         }
 
