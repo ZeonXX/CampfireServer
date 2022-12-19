@@ -3,6 +3,7 @@ package com.dzen.campfire.server.executors.accounts
 import com.dzen.campfire.api.API
 import com.dzen.campfire.api.models.notifications.account.NotificationAccountsFollowsAdd
 import com.dzen.campfire.api.requests.accounts.RAccountsFollowsChange
+import com.dzen.campfire.server.controllers.ControllerAccounts
 import com.dzen.campfire.server.controllers.ControllerAchievements
 import com.dzen.campfire.server.controllers.ControllerNotifications
 import com.dzen.campfire.server.controllers.ControllerCollisions
@@ -12,7 +13,9 @@ import com.sup.dev.java_pc.sql.SqlQuerySelect
 
 class EAccountsFollowsChange : RAccountsFollowsChange(0, false) {
 
-    override fun check() {}
+    override fun check() {
+        ControllerAccounts.checkAccountBanned(apiAccount.id)
+    }
 
     override fun execute(): Response {
 
