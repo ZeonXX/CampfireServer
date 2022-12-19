@@ -49,5 +49,8 @@ object TAccounts {
     fun isInFollowsList(accountId: Long): String {
         return "(SELECT COUNT(*) FROM " + TCollisions.NAME + " WHERE " + TCollisions.collision_id + "=" + NAME + "." + id + " AND " + TCollisions.owner_id + "=" + accountId + " AND " + TCollisions.collision_type + "=" + API.COLLISION_ACCOUNT_FOLLOW + ")"
     }
+    fun isInFollowingList(accountId: Long): String {
+        return "(SELECT COUNT(*) FROM " + TCollisions.NAME + " WHERE " + TCollisions.collision_id + "=" + accountId + " AND " + TCollisions.owner_id + "=" + NAME + "." + id + " AND " + TCollisions.collision_type + "=" + API.COLLISION_ACCOUNT_FOLLOW + ")"
+    }
 
 }
