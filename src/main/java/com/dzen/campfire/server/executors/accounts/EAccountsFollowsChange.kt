@@ -2,6 +2,7 @@ package com.dzen.campfire.server.executors.accounts
 
 import com.dzen.campfire.api.API
 import com.dzen.campfire.api.models.notifications.account.NotificationAccountsFollowsAdd
+import com.dzen.campfire.api.models.notifications.account.NotificationAccountsFollowsRemove
 import com.dzen.campfire.api.requests.accounts.RAccountsFollowsChange
 import com.dzen.campfire.server.controllers.ControllerAccounts
 import com.dzen.campfire.server.controllers.ControllerAchievements
@@ -20,6 +21,10 @@ class EAccountsFollowsChange : RAccountsFollowsChange(0, false) {
     override fun execute(): Response {
 
         if (!follow) {
+            if (ControllerCollisions.checkCollisionExist(apiAccount.id, accountId, API.COLLISION_ACCOUNT_FOLLOW)) {
+                ControllerNotifications.push(accountId, NotificationAccountsFollowsRemove(apiAccount.imageId, apiAccount.id, apiAccount.name, apiAccount.sex))
+            }
+
             ControllerCollisions.removeCollisions(apiAccount.id, accountId, API.COLLISION_ACCOUNT_FOLLOW)
         } else {
 
