@@ -1,5 +1,7 @@
 package com.dzen.campfire.server.controllers
 
+import java.util.*
+
 object ControllerCensor {
 
     private val SPEC = "\"^%`\\|<>{}[] _/;@#$&+()*~., \"\\!?-\n"
@@ -10,7 +12,7 @@ object ControllerCensor {
     }
 
     fun cens(text: String, mask: String = "{red %s}", letterReplace: String = "\\*"): String {
-        var textLower = text.toLowerCase()
+        var textLower = text.lowercase(Locale.getDefault())
         var resultText = text
 
         for (w in words) {
@@ -21,7 +23,7 @@ object ControllerCensor {
                     if (index + w.word.length == textLower.length || SPEC.contains(textLower[index + w.word.length])) {
                         val replace = mask.format(w.getMask(letterReplace))
                         resultText = resultText.replaceRange(index, index + w.word.length, replace)
-                        textLower = resultText.toLowerCase()
+                        textLower = resultText.lowercase(Locale.getDefault())
                         index += w.word.length - replace.length
                     }
                 }
@@ -50,7 +52,7 @@ object ControllerCensor {
     }
 
     private fun addWord(word: String) {
-        words.add(Word(word.toLowerCase()))
+        words.add(Word(word.lowercase(Locale.getDefault())))
     }
 
     //
