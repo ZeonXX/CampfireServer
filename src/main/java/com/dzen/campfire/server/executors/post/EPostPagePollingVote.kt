@@ -10,29 +10,33 @@ import com.dzen.campfire.server.controllers.*
 import com.dzen.campfire.server.tables.TAccounts
 
 class EPostPagePollingVote : RPostPagePollingVote(0, 0, 0, 0, 0) {
+    companion object {
+        fun getPolling(sourceType: Long, sourceId: Long, sourceIdSub: Long, pollingId: Long): PagePolling? {
+            var pages: Array<Page> = emptyArray()
+
+            if (sourceType == API.PAGES_SOURCE_TYPE_POST || sourceType == 0L /*Обратная совместимость*/) {
+                val publication = ControllerPublications.getPublication(sourceId, 0)
+                if (publication == null || publication !is PublicationPost) throw ApiException(API.ERROR_GONE)
+                pages = publication.pages
+            }
+            if (sourceType == API.PAGES_SOURCE_TYPE_WIKI) {
+                val wikiPages =
+                    ControllerWiki.getPagesByItemId(sourceId, sourceIdSub) ?: throw ApiException(API.ERROR_GONE)
+                pages = wikiPages.pages
+            }
+
+            for (p in pages) {
+                if (p is PagePolling && p.pollingId == pollingId) {
+                    return p
+                }
+            }
+            return null
+        }
+    }
 
     @Throws(ApiException::class)
     override fun check() {
-
-        var pages: Array<Page> = emptyArray()
-
-        if (sourceType == API.PAGES_SOURCE_TYPE_POST || sourceType == 0L /*Обратная совместимость*/) {
-            val publication = ControllerPublications.getPublication(sourceId, apiAccount.id)
-            if (publication == null || publication !is PublicationPost) throw ApiException(API.ERROR_GONE)
-            pages = publication.pages
-        }
-        if (sourceType == API.PAGES_SOURCE_TYPE_WIKI) {
-            val wikiPages = ControllerWiki.getPagesByItemId(sourceId, sourceIdSub) ?: throw ApiException(API.ERROR_GONE)
-            pages = wikiPages.pages
-        }
-
-        var polling: PagePolling? = null
-        for (p in pages) {
-            if (p is PagePolling && p.pollingId == pollingId) {
-                polling = p
-                break
-            }
-        }
+        val polling = getPolling(sourceType, sourceId, sourceIdSub, pollingId)
 
         if (polling == null) throw ApiException(API.ERROR_GONE)
         if (polling.minLevel > apiAccount.accessTag) throw ApiException(E_LOW_LEVEL)

@@ -32,6 +32,7 @@ class EAccountsGetProfile : RAccountsGetProfile(0, "") {
                 TAccounts.lvl,
                 TAccounts.date_create,
                 TAccounts.isInFollowsList(apiAccount.id),
+                TAccounts.isInFollowingList(apiAccount.id),
                 TAccounts.FOLLOWS_COUNT,
                 TAccounts.FOLLOWERS_COUNT,
                 TAccounts.img_title_id,
@@ -53,6 +54,7 @@ class EAccountsGetProfile : RAccountsGetProfile(0, "") {
         val lvl: Long = v.next()
         val dateCreate:Long = v.next()//1543007004777
         val isInFollows = v.next<Any>() as Long == 1L//0
+        val followsYou = v.next<Any>() as Long == 1L//0
         val followsCount = v.next<Long>()//124
         val followersCount = v.next<Long>()//146
         val imageTitleId = v.next<Long>()//480063
@@ -82,6 +84,7 @@ class EAccountsGetProfile : RAccountsGetProfile(0, "") {
                 imageTitleId,
                 imageTitleGifId,
                 isInFollows,
+                followsYou,
                 followsCount,
                 followersCount,
                 status,

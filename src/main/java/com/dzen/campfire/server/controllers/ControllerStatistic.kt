@@ -1,14 +1,11 @@
 package com.dzen.campfire.server.controllers
 
 import com.dzen.campfire.api.API
-import com.dzen.campfire.server.app.App
-import com.dzen.campfire.server.tables.TStatistic
 import com.dzen.campfire.api.tools.ApiException
+import com.dzen.campfire.server.app.App
 import com.sup.dev.java.libs.debug.Debug
 import com.sup.dev.java.libs.debug.err
-import com.sup.dev.java_pc.sql.Database
-import com.sup.dev.java_pc.sql.SqlQueryInsert
-import com.sup.dev.java_pc.sql.SqlQueryRemove
+import java.util.*
 
 object ControllerStatistic {
 
@@ -27,9 +24,9 @@ object ControllerStatistic {
         err(e)
 
         if (App.test) return
-        if ((e.message ?: "").toLowerCase().contains("read timed out")) return
-        if ((e.message ?: "").toLowerCase().contains("broken pipe")) return
-        if ((e.message ?: "").toLowerCase().contains("connection reset")) return
+        if ((e.message ?: "").lowercase(Locale.getDefault()).contains("read timed out")) return
+        if ((e.message ?: "").lowercase(Locale.getDefault()).contains("broken pipe")) return
+        if ((e.message ?: "").lowercase(Locale.getDefault()).contains("connection reset")) return
         put("$requestName ${e.message}", TYPE_ERROR, 0L, Debug.getStack(e), API.VERSION)
     }
 

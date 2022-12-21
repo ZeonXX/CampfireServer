@@ -20,6 +20,7 @@ import com.dzen.campfire.server.tables.*
 import com.sup.dev.java.classes.collections.AnyArray
 import com.sup.dev.java.libs.json.Json
 import com.sup.dev.java_pc.sql.*
+import java.util.*
 
 
 object ControllerAccounts {
@@ -384,7 +385,7 @@ object ControllerAccounts {
 
     fun getByName(name: String): Long {
         val v = Database.select("ControllerAccounts.getByName", SqlQuerySelect(TAccounts.NAME, TAccounts.id)
-                .whereValue(Sql.LOWER(TAccounts.name), "=", name.toLowerCase()))
+                .whereValue(Sql.LOWER(TAccounts.name), "=", name.lowercase(Locale.getDefault())))
         return if (v.isEmpty) 0L else v.next()
     }
 

@@ -21,5 +21,10 @@ object TCollisions {
     val FANDOM_IMAGE_ID = Sql.IFNULL("(SELECT ${TFandoms.image_id} FROM ${TFandoms.NAME} WHERE ${TFandoms.id}=$collision_id)", 0)
     val FANDOM_NAME = Sql.IFNULL("(SELECT ${TFandoms.name} FROM ${TFandoms.NAME} WHERE ${TFandoms.id}=$collision_id)", "''")
 
-
+    val OWNER_IMAGE_ID = "(SELECT " + TAccounts.img_id + " FROM " + TAccounts.NAME + " WHERE " + TAccounts.id + "=" + TCollisions.owner_id + ")"
+    val OWNER_SEX = "(SELECT " + TAccounts.sex + " FROM " + TAccounts.NAME + " WHERE " + TAccounts.id + "=" + TCollisions.owner_id + ")"
+    val OWNER_LVL = "(SELECT " + TAccounts.lvl + " FROM " + TAccounts.NAME + " WHERE " + TAccounts.id + "=" + TCollisions.owner_id + ")"
+    val OWNER_KARMA_30 = "(SELECT " + TAccounts.karma_count_30 + " FROM " + TAccounts.NAME + " WHERE " + TAccounts.id + "=" + TCollisions.owner_id + ")"
+    val OWNER_NAME = "(SELECT " + TAccounts.name + " FROM " + TAccounts.NAME + " WHERE " + TAccounts.id + "=" + TCollisions.owner_id + ")"
+    val OWNER_LAST_ONLINE_TIME = "(SELECT " + TAccounts.last_online_time + " FROM " + TAccounts.NAME + " WHERE " + TAccounts.id + "=" + TCollisions.owner_id + ")"
 }
