@@ -17,6 +17,12 @@ object ControllerUserQuests {
             }
             is QuestEffectBox -> {
                 if (!effect.box.link.startsWith("box_")) return false
+                if (arrayOf(
+                    API.LINK_BOX_WITH_MINIGAME,
+                    API.LINK_BOX_WITH_CRASH,
+                    API.LINK_BOX_WITH_MAGIC_SCREEN,
+                    API.LINK_BOX_WITH_MAGIC_SCREEN_X2,
+                ).contains(effect.box)) return false
             }
             is QuestEffectBoxReset -> {
                 // no fields
@@ -218,9 +224,9 @@ object ControllerUserQuests {
         }
     }
 
-    fun insertPart(order: Long, questId: Long, part: QuestPart) {
+    fun insertPart(order: Long, questId: Long, part: QuestPart): Long {
         censorAndUploadPart(questId, part)
-        Database.insert(
+        return Database.insert(
             "ControllerUserQuests insertPart", TQuestParts.NAME,
             TQuestParts.part_order, order,
             TQuestParts.unit_id, questId,

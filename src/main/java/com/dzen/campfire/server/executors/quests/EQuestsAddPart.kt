@@ -56,7 +56,7 @@ class EQuestsAddPart : RQuestsAddPart(0, emptyArray()) {
         ).nextMayNullOrNull<Int>()?.toLong() ?: 0
 
         for (part in parts) {
-            ControllerUserQuests.insertPart(++order, questId, part)
+            part.id = ControllerUserQuests.insertPart(++order, questId, part)
         }
 
         return Response(parts)

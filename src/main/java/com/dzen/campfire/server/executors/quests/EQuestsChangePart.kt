@@ -41,6 +41,7 @@ class EQuestsChangePart : RQuestsChangePart(0, QuestPartUnknown()) {
             .where(TQuestParts.id, "=", partId)
             .updateValue(TQuestParts.json_db, newPartText))
 
+        part.id = partId
         return Response(part)
     }
 }
