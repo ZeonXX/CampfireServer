@@ -29,6 +29,7 @@ class EPublicationsKarmaAdd : RPublicationsKarmaAdd(0, false, 0, false) {
                 && publication!!.publicationType != API.PUBLICATION_TYPE_COMMENT
                 && publication!!.publicationType != API.PUBLICATION_TYPE_MODERATION
                 && publication!!.publicationType != API.PUBLICATION_TYPE_STICKERS_PACK
+                && publication!!.publicationType != API.PUBLICATION_TYPE_QUEST
         ) throw ApiException(E_BAD_TYPE)
 
         if (publication!!.myKarma != 0L) throw ApiException(E_ALREADY_EXIST)
@@ -50,7 +51,8 @@ class EPublicationsKarmaAdd : RPublicationsKarmaAdd(0, false, 0, false) {
 
         val rubricKarmaCof = if (publication!!.publicationType == API.PUBLICATION_TYPE_POST && publication!!.tag_6 > 0) ControllerOptimizer.getRubricKarmaCof(publication!!.tag_6) - 100 else 0
         val fandomKarmaCof = if (publication!!.fandom.id < 1) 100 else ControllerOptimizer.getFandomKarmaCof(publication!!.fandom.id)
-        val karmaCof = fandomKarmaCof + rubricKarmaCof
+        val questKarmaCof  = if (publication!!.publicationType == API.PUBLICATION_TYPE_QUEST) 50 else 0
+        val karmaCof = fandomKarmaCof + rubricKarmaCof + questKarmaCof
         val karmaForceD = ControllerKarma.getKarmaForce(apiAccount, up) * (karmaCof / 100.0)
         val karmaForce = if (karmaForceD > 0) {
             if (karmaForceD < 100) 100

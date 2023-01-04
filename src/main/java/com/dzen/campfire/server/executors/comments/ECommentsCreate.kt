@@ -42,6 +42,7 @@ class ECommentsCreate : RCommentsCreate(0, "", null, null, 0, false, 0, 0) {
         if (publication!!.publicationType != API.PUBLICATION_TYPE_POST
                 && publication!!.publicationType != API.PUBLICATION_TYPE_MODERATION
                 && publication!!.publicationType != API.PUBLICATION_TYPE_STICKERS_PACK
+                && publication!!.publicationType != API.PUBLICATION_TYPE_QUEST
         )
             throw ApiException(E_BAD_PUBLICATION_TYPE)
 

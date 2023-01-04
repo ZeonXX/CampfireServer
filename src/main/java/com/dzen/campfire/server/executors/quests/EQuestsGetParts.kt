@@ -7,11 +7,15 @@ import com.dzen.campfire.api.requests.quests.RQuestsModify
 import com.dzen.campfire.api.tools.ApiException
 import com.dzen.campfire.server.tables.TPublications
 import com.dzen.campfire.server.tables.TQuestParts
+import com.dzen.campfire.server.tables.TQuestStates
 import com.sup.dev.java.libs.json.Json
 import com.sup.dev.java_pc.sql.Database
 import com.sup.dev.java_pc.sql.SqlQuerySelect
+import kotlin.properties.Delegates
 
 class EQuestsGetParts : RQuestsGetParts(0) {
+    var isDraft by Delegates.notNull<Boolean>()
+
     override fun check() {
         val v = Database.select("EQuestsGetParts check", SqlQuerySelect(
             TPublications.NAME, TPublications.status, TPublications.creator_id
@@ -20,6 +24,7 @@ class EQuestsGetParts : RQuestsGetParts(0) {
         val creator = v.next<Long>()
         if (status != API.STATUS_PUBLIC && (creator != apiAccount.id && status != API.STATUS_DRAFT))
             throw ApiException(API.ERROR_ACCESS, "not public")
+        isDraft = status == API.STATUS_DRAFT
     }
 
     override fun execute(): Response {
@@ -36,6 +41,19 @@ class EQuestsGetParts : RQuestsGetParts(0) {
             part.id = id
             ret.add(part)
         }
-        return Response(ret.toTypedArray())
+
+        var stateVariables = Json()
+        var stateIndex = 0
+        if (!isDraft) {
+            val state = Database.select("EQuestsGetParts state", SqlQuerySelect(TQuestStates.NAME, TQuestStates.json_db)
+                .where(TQuestStates.unit_id, "=", id)
+                .where(TQuestStates.user_id, "=", apiAccount.id)
+                .count(1))
+            val json = Json(if (!state.isEmpty) state.next() else "{}")
+            stateVariables = json.getJson("stateVariables", Json())!!
+            stateIndex = json.getInt("stateIndex", 0)
+        }
+
+        return Response(ret.toTypedArray(), stateVariables, stateIndex)
     }
 }

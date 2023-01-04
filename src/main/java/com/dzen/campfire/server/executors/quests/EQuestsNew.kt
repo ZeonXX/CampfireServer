@@ -5,10 +5,8 @@ import com.dzen.campfire.api.models.publications.history.HistoryCreate
 import com.dzen.campfire.api.models.quests.QuestDetails
 import com.dzen.campfire.api.requests.quests.RQuestsNew
 import com.dzen.campfire.api.tools.ApiException
-import com.dzen.campfire.server.controllers.ControllerAccounts
-import com.dzen.campfire.server.controllers.ControllerCensor
-import com.dzen.campfire.server.controllers.ControllerFandom
-import com.dzen.campfire.server.controllers.ControllerPublicationsHistory
+import com.dzen.campfire.server.controllers.*
+import com.dzen.campfire.server.controllers.ControllerCensor.censorNoFormat
 import com.dzen.campfire.server.tables.TPublications
 import com.sup.dev.java.libs.json.Json
 import com.sup.dev.java_pc.sql.Database
@@ -26,7 +24,7 @@ class EQuestsNew : RQuestsNew("", 0) {
 
     override fun execute(): Response {
         val quest = QuestDetails()
-        quest.title = title
+        quest.title = title.censorNoFormat()
         quest.id = Database.insert(
             "EQuestsNew", TPublications.NAME,
             TPublications.publication_type, API.PUBLICATION_TYPE_QUEST,
@@ -49,6 +47,6 @@ class EQuestsNew : RQuestsNew("", 0) {
             HistoryCreate(apiAccount.id, apiAccount.imageId, apiAccount.name)
         )
 
-        return Response(quest)
+        return Response(ControllerPublications.getPublication(quest.id, apiAccount.id) as QuestDetails)
     }
 }

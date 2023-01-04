@@ -3,7 +3,6 @@ package com.dzen.campfire.server.executors.quests
 import com.dzen.campfire.api.requests.quests.RQuestsReorderPart
 import com.dzen.campfire.server.controllers.ControllerAccounts
 import com.dzen.campfire.server.tables.TQuestParts
-import com.dzen.campfire.server.tables.TWikiTitles
 import com.sup.dev.java_pc.sql.Database
 import com.sup.dev.java_pc.sql.SqlQuerySelect
 import com.sup.dev.java_pc.sql.SqlQueryUpdate
@@ -29,8 +28,8 @@ class EQuestsReorderPart : RQuestsReorderPart(0, 0, 0) {
             val id: Long = v.next()
             val sourceOrder: Long = v.next()
             val order = if (id == partIdBefore) {
+                tgtOrder = idx
                 idx += 2
-                tgtOrder = idx - 2
                 idx - 1
             } else {
                 idx++
@@ -41,9 +40,10 @@ class EQuestsReorderPart : RQuestsReorderPart(0, 0, 0) {
                 .update(TQuestParts.part_order, order))
         }
 
-        Database.update("EQuestsReorderPart_finish", SqlQueryUpdate(TWikiTitles.NAME)
-            .where(TWikiTitles.item_id, "=", partIdBefore)
-            .update(TWikiTitles.priority, tgtOrder))
+        println("moving $partId from x to $tgtOrder")
+        Database.update("EQuestsReorderPart_finish", SqlQueryUpdate(TQuestParts.NAME)
+            .where(TQuestParts.id, "=", partId)
+            .update(TQuestParts.part_order, tgtOrder))
         return Response()
     }
 }

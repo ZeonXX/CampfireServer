@@ -40,7 +40,7 @@ object ControllerUserQuests {
         if (input.hint.length > API.QUEST_INPUT_HINT_MAX_L) return false
         if (input.defaultValue.isNotEmpty() &&
 			!checkVariableValue(input.type, input.defaultValue)) return false
-        if (details.variablesMap[input.varId] != null) return false
+        if (details.variablesMap?.get(input.varId) == null) return false
         return true
     }
     private fun checkInputs(details: QuestDetails, inputs: Array<QuestInput>): Boolean {
@@ -49,17 +49,20 @@ object ControllerUserQuests {
         return true
     }
 
-    private fun checkButton(button: QuestButton): Boolean {
+    private fun checkButton(button: QuestButton, allParts: Array<QuestPart>? = null): Boolean {
 		if (button.label.isEmpty()) return false
         if (button.label.length > API.QUEST_BUTTON_LABEL_MAX_L) return false
         if (!API.QUEST_BUTTON_COLORS.contains(button.color)) return false
         if (button.jumpToId < -2) return false
+        allParts?.let {
+            if (button.jumpToId >= 0 && ! allParts.any { it.id == button.jumpToId }) return false
+        }
         return true
     }
-    private fun checkButtons(buttons: Array<QuestButton>): Boolean {
+    private fun checkButtons(buttons: Array<QuestButton>, allParts: Array<QuestPart>? = null): Boolean {
         if (buttons.isEmpty()) return false
         if (buttons.size > API.QUEST_TEXT_BUTTONS_MAX) return false
-        for (button in buttons) if (!checkButton(button)) return false
+        for (button in buttons) if (!checkButton(button, allParts)) return false
         return true
     }
 
@@ -74,7 +77,11 @@ object ControllerUserQuests {
         return true
     }
 
-    private fun checkQuestAction(details: QuestDetails, part: QuestPartAction): Boolean {
+    private fun checkQuestAction(
+        details: QuestDetails,
+        part: QuestPartAction,
+        allParts: Array<QuestPart>? = null,
+    ): Boolean {
         val variable = details.variablesMap!![part.varId] ?: return false
         when (part.actionType) {
             API.QUEST_ACTION_SET_LITERAL -> {
@@ -94,7 +101,7 @@ object ControllerUserQuests {
                 if (variable.type != API.QUEST_TYPE_BOOL &&
                     !checkVariableValue(variable.type, part.sArg)) return false
             }
-            API.QUEST_ACTION_ADD_ANOTHER -> {
+            API.QUEST_ACTION_ADD_ANOTHER, API.QUEST_ACTION_SUB_ANOTHER -> {
                 val var2 = details.variablesMap!![part.lArg1] ?: return false
                 if (variable.type != var2.type) return false
                 if (variable.type == API.QUEST_TYPE_BOOL) return false
@@ -113,10 +120,18 @@ object ControllerUserQuests {
             }
             else -> return false
         }
+        if (part.jumpId < -2) return false
+        allParts?.let {
+            if (part.jumpId >= 0 && ! allParts.any { it.id == part.jumpId }) return false
+        }
         return true
     }
 
-    private fun checkQuestCondition(details: QuestDetails, part: QuestPartCondition): Boolean {
+    private fun checkQuestCondition(
+        details: QuestDetails,
+        part: QuestPartCondition,
+        allParts: Array<QuestPart>? = null,
+    ): Boolean {
         fun condToType(cv: QuestConditionValue): Long? = when (cv.type) {
             API.QUEST_CONDITION_VALUE_LITERAL_LONG -> API.QUEST_TYPE_NUMBER
             API.QUEST_CONDITION_VALUE_LITERAL_TEXT -> API.QUEST_TYPE_TEXT
@@ -140,24 +155,29 @@ object ControllerUserQuests {
         }
 
         if (part.falseJumpId < -2 || part.trueJumpId < -2) return false
+        allParts?.let {
+            if (part.falseJumpId >= 0 && ! allParts.any { it.id == part.falseJumpId }) return false
+            if (part.trueJumpId  >= 0 && ! allParts.any { it.id == part.trueJumpId  }) return false
+        }
+
         return true
     }
 
-    fun checkPart(details: QuestDetails, part: QuestPart): Boolean {
+    fun checkPart(details: QuestDetails, part: QuestPart, allParts: Array<QuestPart>? = null): Boolean {
         if (part.devLabel.length > API.QUEST_DEV_LABEL_MAX_L) return false
         when (part) {
             is QuestPartText -> {
                 if (part.title.length > API.QUEST_TEXT_TITLE_MAX_L) return false
                 if (part.text.length > API.QUEST_TEXT_TEXT_MAX_L) return false
                 if (!checkInputs(details, part.inputs)) return false
-                if (!checkButtons(part.buttons)) return false
+                if (!checkButtons(part.buttons, allParts)) return false
                 if (!checkEffects(part.effects)) return false
             }
             is QuestPartAction -> {
-                if (!checkQuestAction(details, part)) return false
+                if (!checkQuestAction(details, part, allParts)) return false
             }
             is QuestPartCondition -> {
-                if (!checkQuestCondition(details, part)) return false
+                if (!checkQuestCondition(details, part, allParts)) return false
             }
             else -> return false
         }
@@ -167,7 +187,8 @@ object ControllerUserQuests {
     fun partClean(part: QuestPart, newPart: QuestPart? = null) {
         when (part) {
             is QuestPartText -> {
-                if ((newPart as? QuestPartText?)?.imageId != part.imageId) ControllerResources.remove(part.imageId)
+                if ((newPart as? QuestPartText?)?.imageId != part.imageId && part.imageId > 0)
+                    ControllerResources.remove(part.imageId)
             }
         }
     }

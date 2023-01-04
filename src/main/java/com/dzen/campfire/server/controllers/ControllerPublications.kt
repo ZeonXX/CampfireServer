@@ -20,6 +20,7 @@ import com.dzen.campfire.api.models.publications.moderations.PublicationModerati
 import com.dzen.campfire.api.models.publications.post.PageText
 import com.dzen.campfire.api.models.publications.post.PublicationPost
 import com.dzen.campfire.api.models.publications.tags.PublicationTag
+import com.dzen.campfire.api.models.quests.QuestDetails
 import com.dzen.campfire.api.tools.ApiAccount
 import com.dzen.campfire.server.optimizers.OptimizerEffects
 import com.dzen.campfire.server.tables.*
@@ -49,6 +50,9 @@ object ControllerPublications {
             }
             is PublicationChatMessage -> {
                 text = publication.text
+            }
+            is QuestDetails -> {
+                text = publication.title
             }
         }
         text = TextFormatter(text).parseNoTags()
