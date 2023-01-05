@@ -1,5 +1,13 @@
 package com.dzen.campfire.server.controllers
 
+import com.dzen.campfire.api.API
+import com.dzen.campfire.api.models.quests.*
+import com.dzen.campfire.server.controllers.ControllerCensor.censor
+import com.dzen.campfire.server.controllers.ControllerCensor.censorNoFormat
+import com.dzen.campfire.server.tables.TQuestParts
+import com.sup.dev.java.libs.json.Json
+import com.sup.dev.java_pc.sql.Database
+
 object ControllerUserQuests {
     private fun checkEffect(effect: QuestEffect): Boolean {
         when (effect) {
@@ -11,18 +19,18 @@ object ControllerUserQuests {
                 if (effect.delayStart < 0 || effect.delayStart > API.QUEST_EFFECT_VIBRATE_DELAY_START_MAX)
                     return false
                 val min = if (effect.times == 0) API.QUEST_EFFECT_VIBRATE_DELAY_BETWEEN_INF_MIN
-                          else API.QUEST_EFFECT_VIBRATE_DELAY_BETWEEN_MIN
+                else API.QUEST_EFFECT_VIBRATE_DELAY_BETWEEN_MIN
                 if (effect.delayBetween < min || effect.delayBetween > API.QUEST_EFFECT_VIBRATE_DELAY_BETWEEN_MAX)
                     return false
             }
             is QuestEffectBox -> {
                 if (!effect.box.link.startsWith("box_")) return false
                 if (arrayOf(
-                    API.LINK_BOX_WITH_MINIGAME,
-                    API.LINK_BOX_WITH_CRASH,
-                    API.LINK_BOX_WITH_MAGIC_SCREEN,
-                    API.LINK_BOX_WITH_MAGIC_SCREEN_X2,
-                ).contains(effect.box)) return false
+                        API.LINK_BOX_WITH_MINIGAME,
+                        API.LINK_BOX_WITH_CRASH,
+                        API.LINK_BOX_WITH_MAGIC_SCREEN,
+                        API.LINK_BOX_WITH_MAGIC_SCREEN_X2,
+                    ).contains(effect.box)) return false
             }
             is QuestEffectBoxReset -> {
                 // no fields
@@ -43,10 +51,10 @@ object ControllerUserQuests {
     }
 
     private fun checkInput(details: QuestDetails, input: QuestInput): Boolean {
-		if (input.hint.isEmpty()) return false
+        if (input.hint.isEmpty()) return false
         if (input.hint.length > API.QUEST_INPUT_HINT_MAX_L) return false
         if (input.defaultValue.isNotEmpty() &&
-			!checkVariableValue(input.type, input.defaultValue)) return false
+            !checkVariableValue(input.type, input.defaultValue)) return false
         if (details.variablesMap?.get(input.varId) == null) return false
         return true
     }
@@ -57,7 +65,7 @@ object ControllerUserQuests {
     }
 
     private fun checkButton(button: QuestButton, allParts: Array<QuestPart>? = null): Boolean {
-		if (button.label.isEmpty()) return false
+        if (button.label.isEmpty()) return false
         if (button.label.length > API.QUEST_BUTTON_LABEL_MAX_L) return false
         if (!API.QUEST_BUTTON_COLORS.contains(button.color)) return false
         if (button.jumpToId < -2) return false

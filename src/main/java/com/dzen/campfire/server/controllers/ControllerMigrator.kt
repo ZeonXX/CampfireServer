@@ -31,7 +31,7 @@ object ControllerMigrator {
         }
 
         val file = File(App.secretsConfig.getString("patch_prefix"))
-            .resolve("../../res/images/bg/bg_30.png")
+            .resolve("../../../res/images/bg/bg_31.png")
         val id = ControllerResources.putTag(ToolsFiles.readFile(file), 0, "bg")
         info("resource id bg_30: $id")
     }
