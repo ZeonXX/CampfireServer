@@ -7,8 +7,8 @@ import com.dzen.campfire.api.models.publications.PublicationComment
 import com.dzen.campfire.api.models.publications.chat.PublicationChatMessage
 import com.dzen.campfire.api.models.publications.stickers.PublicationSticker
 import com.dzen.campfire.api.requests.publications.RPublicationsRemove
-import com.dzen.campfire.server.controllers.*
 import com.dzen.campfire.api.tools.ApiException
+import com.dzen.campfire.server.controllers.*
 import com.dzen.campfire.server.tables.TPublications
 import com.sup.dev.java_pc.sql.Database
 import com.sup.dev.java_pc.sql.SqlQueryUpdate
@@ -29,6 +29,7 @@ class EPublicationsRemove : RPublicationsRemove(0) {
                 && publication.publicationType != API.PUBLICATION_TYPE_CHAT_MESSAGE
                 && publication.publicationType != API.PUBLICATION_TYPE_STICKERS_PACK
                 && publication.publicationType != API.PUBLICATION_TYPE_STICKER
+                && publication.publicationType != API.PUBLICATION_TYPE_QUEST
                 && publication.publicationType != API.PUBLICATION_TYPE_POST)
             throw ApiException(E_BAD_TYPE)
 

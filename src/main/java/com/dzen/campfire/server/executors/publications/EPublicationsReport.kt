@@ -2,11 +2,11 @@ package com.dzen.campfire.server.executors.publications
 
 import com.dzen.campfire.api.API
 import com.dzen.campfire.api.requests.publications.RPublicationsReport
-import com.dzen.campfire.server.controllers.ControllerPublications
-import com.dzen.campfire.server.tables.TPublications
 import com.dzen.campfire.api.tools.ApiException
 import com.dzen.campfire.server.controllers.ControllerAccounts
+import com.dzen.campfire.server.controllers.ControllerPublications
 import com.dzen.campfire.server.tables.TCollisions
+import com.dzen.campfire.server.tables.TPublications
 import com.sup.dev.java_pc.sql.Database
 import com.sup.dev.java_pc.sql.SqlQueryUpdate
 
@@ -28,6 +28,7 @@ class EPublicationsReport : RPublicationsReport(0, "") {
                 && publicationType != API.PUBLICATION_TYPE_CHAT_MESSAGE
                 && publicationType != API.PUBLICATION_TYPE_STICKER
                 && publicationType != API.PUBLICATION_TYPE_STICKERS_PACK
+                && publicationType != API.PUBLICATION_TYPE_QUEST
         ) throw ApiException(E_BAD_TYPE)
 
         ControllerAccounts.checkAccountBanned(apiAccount.id)

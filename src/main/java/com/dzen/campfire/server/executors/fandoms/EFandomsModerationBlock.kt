@@ -1,8 +1,8 @@
 package com.dzen.campfire.server.executors.fandoms
 
 import com.dzen.campfire.api.API
-import com.dzen.campfire.api.models.chat.ChatTag
 import com.dzen.campfire.api.models.account.AccountPunishment
+import com.dzen.campfire.api.models.chat.ChatTag
 import com.dzen.campfire.api.models.notifications.publications.NotificationPublicationBlock
 import com.dzen.campfire.api.models.notifications.publications.NotificationPublicationBlockAfterReport
 import com.dzen.campfire.api.models.publications.Publication
@@ -12,17 +12,16 @@ import com.dzen.campfire.api.models.publications.events_user.ApiEventUserAdminPu
 import com.dzen.campfire.api.models.publications.history.HistoryAdminBlock
 import com.dzen.campfire.api.models.publications.moderations.publications.ModerationBlock
 import com.dzen.campfire.api.requests.fandoms.RFandomsModerationBlock
+import com.dzen.campfire.api.tools.ApiException
 import com.dzen.campfire.server.controllers.*
 import com.dzen.campfire.server.tables.TCollisions
 import com.dzen.campfire.server.tables.TPublications
-import com.dzen.campfire.api.tools.ApiException
 import com.sup.dev.java.tools.ToolsCollections
 import com.sup.dev.java.tools.ToolsMapper
 import com.sup.dev.java_pc.sql.Database
 import com.sup.dev.java_pc.sql.SqlQuerySelect
 import com.sup.dev.java_pc.sql.SqlQueryUpdate
 import com.sup.dev.java_pc.sql.SqlWhere
-import java.util.*
 
 class EFandomsModerationBlock : RFandomsModerationBlock(0, 0, false, "", false, 0) {
 
@@ -38,6 +37,7 @@ class EFandomsModerationBlock : RFandomsModerationBlock(0, 0, false, "", false, 
         if (publication!!.creator.id == apiAccount.id) throw ApiException(E_SELF_PUBLICATION)
         if (publication!!.status == API.STATUS_DRAFT) throw ApiException(E_DRAFT)
         if (publication!!.status != API.STATUS_PUBLIC) throw ApiException(E_ALREADY)
+        if (publication!!.publicationType == API.PUBLICATION_TYPE_QUEST) throw ApiException(API.ERROR_ACCESS)
 
         languageId = publication!!.fandom.languageId
         if (publication!!.fandom.languageId == -1L && publication!!.publicationType == API.PUBLICATION_TYPE_POST) languageId = userLanguageId

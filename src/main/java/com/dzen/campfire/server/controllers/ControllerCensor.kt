@@ -35,6 +35,9 @@ object ControllerCensor {
         return resultText
     }
 
+    fun String.censor() = cens(this)
+    fun String.censorNoFormat() = cens(this, "%s", "*")
+
     //
     //  Words
     //

@@ -470,6 +470,10 @@ object ControllerAccounts {
         updateCollisionSet(accountId, newCount, API.COLLISION_ACCOUNT_POSTS_KARMA) { Database.select("ControllerAccounts.updatePostKarma select", SqlQuerySelect(TPublications.NAME, Sql.MAX(TPublications.karma_count)).where(TPublications.creator_id, "=", accountId).where(TPublications.status, "=", API.STATUS_PUBLIC).where(TPublications.publication_type, "=", API.PUBLICATION_TYPE_POST)).nextLongOrZero() }
     }
 
+    fun updateQuestKarma(accountId: Long, newCount: Long) {
+        updateCollisionSet(accountId, newCount, API.COLLISION_ACCOUNT_QUESTS_KARMA) { Database.select("ControllerAccounts.updateQuestKarma select", SqlQuerySelect(TPublications.NAME, Sql.MAX(TPublications.karma_count)).where(TPublications.creator_id, "=", accountId).where(TPublications.status, "=", API.STATUS_PUBLIC).where(TPublications.publication_type, "=", API.PUBLICATION_TYPE_QUEST)).nextLongOrZero() }
+    }
+
     fun updateCommentsKarma(accountId: Long, newCount: Long) {
         updateCollisionSet(accountId, newCount, API.COLLISION_ACCOUNT_COMMENTS_KARMA) { Database.select("ControllerAccounts.updateCommentsKarma select", SqlQuerySelect(TPublications.NAME, TPublications.karma_count).where(TPublications.creator_id, "=", accountId).where(TPublications.status, "=", API.STATUS_PUBLIC).where(TPublications.publication_type, "=", API.PUBLICATION_TYPE_COMMENT).sort(TPublications.karma_count, false).count(1)).nextLongOrZero() }
     }

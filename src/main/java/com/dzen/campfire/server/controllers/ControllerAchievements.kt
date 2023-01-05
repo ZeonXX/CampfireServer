@@ -72,6 +72,7 @@ object ControllerAchievements {
         addAchievementWithCheck(accountId, API.ACHI_VICEROY_LINK, false, false)
         addAchievementWithCheck(accountId, API.ACHI_VICEROY_IMAGES, false, false)
         addAchievementWithCheck(accountId, API.ACHI_VICEROY_DESCRIPTION, false, false)
+        addAchievementWithCheck(accountId, API.ACHI_QUEST_KARMA, false, false)
 
     }
 
@@ -188,6 +189,7 @@ object ControllerAchievements {
             API.ACHI_CONTENT_SHARE -> ControllerPublications.getCollisionCountByCollisionId(accountId, API.COLLISION_SHARE)
             API.ACHI_MODERATOR_COUNT -> if (Database.select("ControllerAchievements.getValue ACHI_MODERATOR_COUNT", SqlQuerySelect(TAccounts.NAME, TAccounts.lvl).where(TAccounts.id, "=", accountId)).nextLongOrZero() >= API.LVL_MODERATOR_BLOCK.lvl) ControllerFandom.getModerationFandomsCount(accountId) else 0
             API.ACHI_KARMA_30 -> ControllerAccounts.get(accountId, TAccounts.karma_count_30).next()
+            API.ACHI_QUEST_KARMA -> ControllerCollisions.getCollision(accountId, API.COLLISION_ACCOUNT_QUESTS_KARMA, 0)
 
             else -> throw RuntimeException("Unknown Achievement ${achievementInfo.index}")
         }
