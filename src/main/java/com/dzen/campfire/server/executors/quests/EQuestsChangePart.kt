@@ -1,11 +1,14 @@
 package com.dzen.campfire.server.executors.quests
 
 import com.dzen.campfire.api.API
+import com.dzen.campfire.api.models.quests.QuestDetails
 import com.dzen.campfire.api.models.quests.QuestPart
 import com.dzen.campfire.api.models.quests.QuestPartUnknown
+import com.dzen.campfire.api.requests.quests.RQuestsAddPart
 import com.dzen.campfire.api.requests.quests.RQuestsChangePart
 import com.dzen.campfire.api.tools.ApiException
 import com.dzen.campfire.server.controllers.ControllerAccounts
+import com.dzen.campfire.server.controllers.ControllerPublications
 import com.dzen.campfire.server.controllers.ControllerUserQuests
 import com.dzen.campfire.server.tables.TQuestParts
 import com.sup.dev.java.libs.json.Json
@@ -26,6 +29,10 @@ class EQuestsChangePart : RQuestsChangePart(0, QuestPartUnknown()) {
 
         questId = qp.next()
         checkQuestEditable(questId, apiAccount)
+
+        val details = ControllerPublications.getPublication(questId, apiAccount.id) as QuestDetails
+        if (!ControllerUserQuests.checkPart(details, part))
+            throw ApiException(RQuestsAddPart.BAD_PART, "part failed the check")
     }
 
     override fun execute(): Response {

@@ -6,8 +6,6 @@ import com.dzen.campfire.server.tables.*
 import com.sup.dev.java.classes.items.Item2
 import com.sup.dev.java.tools.ToolsDate
 import com.sup.dev.java_pc.sql.*
-import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
 
 object ControllerOptimizer {
 
@@ -360,6 +358,11 @@ object ControllerOptimizer {
 
             if (transaction.publication.publicationType == API.PUBLICATION_TYPE_STICKERS_PACK) ControllerAccounts.updateStickersKarma(transaction.publication.creator.id, transaction.publication.karmaCount)
             if (transaction.publication.publicationType == API.PUBLICATION_TYPE_STICKERS_PACK) ControllerAchievements.addAchievementWithCheck(transaction.publication.creator.id, API.ACHI_STICKERS_KARMA)
+
+            if (transaction.publication.publicationType == API.PUBLICATION_TYPE_QUEST) {
+                ControllerAccounts.updateQuestKarma(transaction.publication.creator.id, transaction.publication.karmaCount)
+                ControllerAchievements.addAchievementWithCheck(transaction.publication.creator.id, API.ACHI_QUEST_KARMA)
+            }
 
             ControllerAchievements.addAchievementWithCheck(transaction.accountId, API.ACHI_RATE)
             ControllerAchievements.addAchievementWithCheck(transaction.accountId, API.ACHI_RATES_COUNT)

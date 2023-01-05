@@ -32,11 +32,12 @@ object ControllerUserQuests {
         return true
     }
     private fun checkEffects(effects: Array<QuestEffect>): Boolean {
-        val visited = mutableSetOf<Long>()
+        if (effects.size > API.QUEST_EFFECT_MAX_L) return false
+        var vibrationMet = false
         for (effect in effects) {
-            if (visited.contains(effect.getEffectType())) return false
+            if (effect is QuestEffectVibrate && vibrationMet) return false
             if (!checkEffect(effect)) return false
-            visited.add(effect.getEffectType())
+            vibrationMet = true
         }
         return true
     }
