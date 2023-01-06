@@ -44,8 +44,8 @@ object ControllerUserQuests {
         var vibrationMet = false
         for (effect in effects) {
             if (effect is QuestEffectVibrate && vibrationMet) return false
+            if (effect is QuestEffectVibrate) vibrationMet = true
             if (!checkEffect(effect)) return false
-            vibrationMet = true
         }
         return true
     }
@@ -120,6 +120,8 @@ object ControllerUserQuests {
                 val var2 = details.variablesMap!![part.lArg1] ?: return false
                 if (variable.type != var2.type) return false
                 if (variable.type == API.QUEST_TYPE_BOOL) return false
+                if (part.actionType == API.QUEST_ACTION_SUB_ANOTHER && variable.type == API.QUEST_TYPE_TEXT)
+                    return false
             }
             API.QUEST_ACTION_SET_ARANDOM -> {
                 val var2 = details.variablesMap!![part.lArg1] ?: return false
@@ -131,6 +133,7 @@ object ControllerUserQuests {
             API.QUEST_ACTION_MULTIPLY, API.QUEST_ACTION_DIVIDE,
             API.QUEST_ACTION_BIT_AND, API.QUEST_ACTION_BIT_OR -> {
                 val var2 = details.variablesMap!![part.lArg1] ?: return false
+                if (variable.type != API.QUEST_TYPE_NUMBER) return false
                 if (var2.type != API.QUEST_TYPE_NUMBER) return false
             }
             else -> return false
