@@ -1,24 +1,15 @@
 package com.dzen.campfire.server.controllers
 
 import com.dzen.campfire.api.API
-import com.dzen.campfire.api.API_RESOURCES
 import com.dzen.campfire.api.API_TRANSLATE
 import com.dzen.campfire.api.models.publications.chat.PublicationChatMessage
 import com.dzen.campfire.server.app.App
-import com.dzen.campfire.server.tables.TAccountsEmails
 import com.dzen.campfire.server.tables.TPublications
 import com.dzen.campfire.server.tables.TTranslates
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.ImportUserRecord
-import com.google.firebase.auth.UserImportOptions
-import com.google.firebase.auth.hash.Bcrypt
-import com.sup.dev.java.libs.debug.err
 import com.sup.dev.java.libs.debug.info
 import com.sup.dev.java.tools.ToolsCryptography
-import com.sup.dev.java.tools.ToolsFiles
 import com.sup.dev.java.tools.ToolsThreads
 import com.sup.dev.java_pc.sql.*
-import java.io.File
 
 
 object ControllerMigrator {
@@ -29,11 +20,6 @@ object ControllerMigrator {
                 if (i.serverFlag_WillUpload) ru(i.key, i.text)
             }
         }
-
-        val file = File(App.secretsConfig.getString("patch_prefix"))
-            .resolve("../../../res/images/bg/bg_31.png")
-        val id = ControllerResources.putTag(ToolsFiles.readFile(file), 0, "bg")
-        info("resource id bg_30: $id")
     }
 
     fun addImagePasswords() {

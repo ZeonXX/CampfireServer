@@ -49,10 +49,8 @@ class EQuestsAddPart : RQuestsAddPart(0, emptyArray()) {
 
     override fun execute(): Response {
         var order = Database.select(
-            "EQuestsAddPart 2", SqlQuerySelect(TQuestParts.NAME, TQuestParts.part_order)
-                .where(TQuestParts.unit_id, "=", questId)
-                .sort(TQuestParts.part_order, false)
-                .count(1)
+            "EQuestsAddPart 2", SqlQuerySelect(TQuestParts.NAME, Sql.MAX(TQuestParts.part_order))
+                .where(TQuestParts.unit_id, "=", questId),
         ).nextMayNullOrNull<Int>()?.toLong() ?: 0
 
         for (part in parts) {

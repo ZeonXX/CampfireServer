@@ -3,7 +3,6 @@ package com.dzen.campfire.server.executors.quests
 import com.dzen.campfire.api.API
 import com.dzen.campfire.api.models.quests.QuestPart
 import com.dzen.campfire.api.requests.quests.RQuestsGetParts
-import com.dzen.campfire.api.requests.quests.RQuestsModify
 import com.dzen.campfire.api.tools.ApiException
 import com.dzen.campfire.server.tables.TPublications
 import com.dzen.campfire.server.tables.TQuestParts
@@ -32,6 +31,7 @@ class EQuestsGetParts : RQuestsGetParts(0) {
             "EQuestsGetParts execute",
             SqlQuerySelect(TQuestParts.NAME, TQuestParts.id, TQuestParts.json_db)
                 .where(TQuestParts.unit_id, "=", id)
+                .sort(TQuestParts.part_order, true)
         )
         val ret = arrayListOf<QuestPart>()
         while (parts.hasNext()) {
